@@ -1,12 +1,8 @@
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
-struct WindowState {
-  uint16_t width;
-  uint16_t height;
-};
-
-WindowState windowState{.width = 800, .height = 500};
+uint32_t window_width = 800;
+uint32_t window_height = 500;
 
 int main() {
   printf("hello, stranger.\n");
@@ -18,8 +14,8 @@ int main() {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-  auto window = glfwCreateWindow(windowState.width, windowState.height, "neon",
-                                 nullptr, nullptr);
+  auto window =
+      glfwCreateWindow(window_width, window_height, "neon", nullptr, nullptr);
   if (!window) {
     glfwTerminate();
     return 1;
