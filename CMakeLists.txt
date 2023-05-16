@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 project(neon)
 
+set(CMAKE_CXX_STANDARD 23)
+
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "")
 set(GLFW_INSTALL OFF CACHE BOOL "")
 
