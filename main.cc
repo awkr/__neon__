@@ -39,8 +39,6 @@ int main() {
   });
 
   if (!createInstance(&instance, &messenger)) {
-    glfwDestroyWindow(window);
-    glfwTerminate();
     return 1;
   }
 
@@ -50,12 +48,6 @@ int main() {
   }
 
   if (!createDevice(instance, &device)) {
-    vkDestroySurfaceKHR(instance, surface, nullptr);
-    surface = VK_NULL_HANDLE;
-    destroyInstance(&instance, &messenger);
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
     return 1;
   }
 
