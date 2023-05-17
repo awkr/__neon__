@@ -38,8 +38,7 @@ bool createInstance(VkInstance *instance, VkDebugUtilsMessengerEXT *messenger) {
   for (const auto &requiredExtension : requiredInstanceExtensions) {
     bool found;
     for (const auto &availableExtension : availableInstanceExtensions) {
-      if (stringEquals(availableExtension.extensionName,
-                       requiredExtension.first)) {
+      if (equals(availableExtension.extensionName, requiredExtension.first)) {
         found = true;
         break;
       }
@@ -71,7 +70,7 @@ bool createInstance(VkInstance *instance, VkDebugUtilsMessengerEXT *messenger) {
   for (const auto &requiredLayer : requiredInstanceLayers) {
     bool found;
     for (const auto &availableLayer : availableInstanceLayers) {
-      if (stringEquals(availableLayer.layerName, requiredLayer.first)) {
+      if (equals(availableLayer.layerName, requiredLayer.first)) {
         found = true;
         break;
       }

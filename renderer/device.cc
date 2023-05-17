@@ -68,8 +68,7 @@ bool createDevice(VkInstance instance, Device *device) {
   for (const auto &requiredExtension : requiredDeviceExtensions) {
     bool found;
     for (const auto &availableExtension : availableDeviceExtensions) {
-      if (stringEquals(availableExtension.extensionName,
-                       requiredExtension.first)) {
+      if (equals(availableExtension.extensionName, requiredExtension.first)) {
         found = true;
         break;
       }
