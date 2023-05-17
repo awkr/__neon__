@@ -1,9 +1,8 @@
 #include "renderer/instance.h"
+#include "core/string_utils.h"
 #include <unordered_map>
 #include <vector>
 #include <vulkan/vulkan_metal.h>
-
-bool stringEquals(const char *a, const char *b) { return strcmp(a, b) == 0; }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL messengerCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,

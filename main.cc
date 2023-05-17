@@ -1,3 +1,4 @@
+#include "renderer/device.h"
 #include "renderer/instance.h"
 #include <GLFW/glfw3.h>
 #include <cstdio>
@@ -8,6 +9,8 @@ uint32_t windowHeight{500};
 
 VkInstance instance{VK_NULL_HANDLE};
 VkDebugUtilsMessengerEXT messenger{VK_NULL_HANDLE};
+VkSurfaceKHR surface{VK_NULL_HANDLE};
+Device device{};
 
 int main() {
   printf("hello, stranger.\n");
@@ -39,10 +42,28 @@ int main() {
     return 1;
   }
 
+  if (glfwCreateWindowSurface(instance, window, nullptr, &surface) !=
+      VK_SUCCESS) {
+    return 1;
+  }
+
+  if (!createDevice(instance, &device)) {
+    vkDestroySurfaceKHR(instance, surface, nullptr);
+    surface = VK_NULL_HANDLE;
+    destroyInstance(&instance, &messenger);
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return 1;
+  }
+
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
   }
 
+  destroyDevice(&device);
+  vkDestroySurfaceKHR(instance, surface, nullptr);
+  surface = VK_NULL_HANDLE;
   destroyInstance(&instance, &messenger);
 
   glfwDestroyWindow(window);
