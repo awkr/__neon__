@@ -1,8 +1,9 @@
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
-uint32_t window_width = 800;
-uint32_t window_height = 500;
+const char *windowTitle = "neon";
+uint32_t windowWidth{800};
+uint32_t windowHeight{500};
 
 int main() {
   printf("hello, stranger.\n");
@@ -14,8 +15,8 @@ int main() {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-  auto window =
-      glfwCreateWindow(window_width, window_height, "neon", nullptr, nullptr);
+  auto window = glfwCreateWindow(windowWidth, windowHeight, windowTitle,
+                                 nullptr, nullptr);
   if (!window) {
     glfwTerminate();
     return 1;
