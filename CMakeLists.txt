@@ -19,6 +19,3 @@ add_executable(neon
 target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan)
 
 target_include_directories(neon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-
-#target_compile_options(neon PRIVATE
-#    GLFW_INCLUDE_VULKAN)
