@@ -1,9 +1,13 @@
+#include "renderer/instance.h"
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
 const char *windowTitle = "neon";
 uint32_t windowWidth{800};
 uint32_t windowHeight{500};
+
+VkInstance instance{VK_NULL_HANDLE};
+VkDebugUtilsMessengerEXT messenger{VK_NULL_HANDLE};
 
 int main() {
   printf("hello, stranger.\n");
@@ -29,9 +33,17 @@ int main() {
     }
   });
 
+  if (!createInstance(&instance, &messenger)) {
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    return 1;
+  }
+
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
   }
+
+  destroyInstance(&instance, &messenger);
 
   glfwDestroyWindow(window);
   glfwTerminate();

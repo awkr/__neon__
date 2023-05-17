@@ -9,9 +9,15 @@ set(GLFW_INSTALL OFF CACHE BOOL "")
 
 add_subdirectory(third-party/glfw)
 
-add_executable(neon main.cc)
+find_package(Vulkan REQUIRED)
 
-target_link_libraries(neon PRIVATE glfw)
+add_executable(neon
+    main.cc
+    renderer/instance.cc)
+
+target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan)
+
+target_include_directories(neon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 #target_compile_options(neon PRIVATE
 #    GLFW_INCLUDE_VULKAN)
