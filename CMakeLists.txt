@@ -14,7 +14,8 @@ find_package(Vulkan REQUIRED)
 add_executable(neon
     main.cc
     renderer/instance.cc
-    renderer/device.cc)
+    renderer/device.cc
+    renderer/swapchain.cc)
 
 target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan)
 

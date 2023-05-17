@@ -1,5 +1,6 @@
 #include "renderer/device.h"
 #include "renderer/instance.h"
+#include "renderer/swapchain.h"
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
@@ -11,6 +12,7 @@ VkInstance instance{VK_NULL_HANDLE};
 VkDebugUtilsMessengerEXT messenger{VK_NULL_HANDLE};
 VkSurfaceKHR surface{VK_NULL_HANDLE};
 Device device{};
+Swapchain swapchain{};
 
 int main() {
   printf("hello, stranger.\n");
@@ -57,10 +59,19 @@ int main() {
     return 1;
   }
 
+  int renderWidth{0}, renderHeight{0};
+  glfwGetFramebufferSize(window, &renderWidth, &renderHeight);
+
+  if (!createSwapchain(&swapchain, &device, surface,
+                       {(uint32_t)renderWidth, (uint32_t)renderHeight}, 3)) {
+    return 1;
+  }
+
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
   }
 
+  destroySwapchain(device.handle, &swapchain);
   destroyDevice(&device);
   vkDestroySurfaceKHR(instance, surface, nullptr);
   surface = VK_NULL_HANDLE;
@@ -69,5 +80,6 @@ int main() {
   glfwDestroyWindow(window);
   glfwTerminate();
 
+  printf("bye.\n");
   return 0;
 }
