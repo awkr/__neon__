@@ -21,7 +21,8 @@ add_executable(neon
     renderer/ostream.cc
     renderer/render_context.cc
     renderer/render_frame.cc
-    renderer/image_view.cc)
+    renderer/image_view.cc
+    renderer/shader_module.cc)
 
 target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan)
 

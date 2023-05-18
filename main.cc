@@ -1,6 +1,7 @@
 #include "renderer/device.h"
 #include "renderer/instance.h"
 #include "renderer/render_context.h"
+#include "renderer/shader_module.h"
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
@@ -62,6 +63,13 @@ int main() {
   }
 
   if (!createRenderContext(&renderContext, &swapchain)) {
+    return 1;
+  }
+
+  ShaderSource vertShader{};
+  ShaderSource fragShader{};
+  if (!createShaderSource(&vertShader, "base.vert") ||
+      !createShaderSource(&fragShader, "base.frag")) {
     return 1;
   }
 
