@@ -1,7 +1,8 @@
 #include "renderer/device.h"
+#include "renderer/forward_subpass.h"
 #include "renderer/instance.h"
 #include "renderer/render_context.h"
-#include "renderer/shader_module.h"
+#include "renderer/render_pipeline.h"
 #include <GLFW/glfw3.h>
 #include <cstdio>
 
@@ -16,6 +17,7 @@ Device device{};
 Swapchain swapchain{};
 
 RenderContext renderContext{};
+RenderPipeline renderPipeline{};
 
 int main() {
   printf("Hello, stranger.\n");
@@ -72,6 +74,11 @@ int main() {
       !createShaderSource(&fragShader, "base.frag")) {
     return 1;
   }
+
+  auto sceneSubpass = new ForwardSubpass(&renderContext, std::move(vertShader),
+                                         std::move(fragShader));
+
+  renderPipeline.addSubpass(sceneSubpass);
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();

@@ -8,6 +8,7 @@ set(GLFW_BUILD_DOCS OFF CACHE BOOL "")
 set(GLFW_INSTALL OFF CACHE BOOL "")
 
 add_subdirectory(third-party/glfw)
+add_subdirectory(third-party/glm)
 
 find_package(Vulkan REQUIRED)
 
@@ -22,8 +23,13 @@ add_executable(neon
     renderer/render_context.cc
     renderer/render_frame.cc
     renderer/image_view.cc
-    renderer/shader_module.cc)
+    renderer/shader_module.cc
+    renderer/forward_subpass.cc
+    renderer/geometry_subpass.cc
+    renderer/subpass.cc
+    renderer/render_pipeline.cc
+    renderer/resource_cache.cc)
 
-target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan)
+target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan glm)
 
 target_include_directories(neon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

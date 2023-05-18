@@ -1,6 +1,7 @@
 #include "renderer/render_context.h"
 
 bool createRenderContext(RenderContext *renderContext, Swapchain *swapchain) {
+  renderContext->device = swapchain->device;
   renderContext->renderFrames.resize(swapchain->images.size());
 
   for (uint32_t i = 0; i < swapchain->images.size(); ++i) {
