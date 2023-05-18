@@ -1,22 +1,30 @@
 #include "renderer/render_context.h"
 
 bool createRenderContext(RenderContext *renderContext, Swapchain *swapchain) {
-  for (const auto &handle : swapchain->images) {
+  renderContext->renderFrames.resize(swapchain->images.size());
+
+  for (uint32_t i = 0; i < swapchain->images.size(); ++i) {
     Image image{};
-    if (!createImage(&image, swapchain->device, handle,
+    if (!createImage(&image, swapchain->device, swapchain->images[i],
                      swapchain->properties.extent,
                      swapchain->properties.surfaceFormat.format)) {
       return false;
     }
-    auto renderTarget = RENDER_TARGET_DEFAULT_CREATE_FUNC(image);
-    renderContext->renderTargets.emplace_back(renderTarget);
+
+    RenderTarget renderTarget{};
+    if (!RENDER_TARGET_DEFAULT_CREATE_FUNC(image, &renderTarget)) {
+      return false;
+    }
+
+    RenderFrame renderFrame{.renderTarget = renderTarget};
+    renderContext->renderFrames[i] = renderFrame;
   }
   return true;
 }
 
 void destroyRenderContext(RenderContext *renderContext) {
-  for (auto &renderTarget : renderContext->renderTargets) {
-    destroyRenderTarget(renderTarget);
+  for (auto &renderFrame : renderContext->renderFrames) {
+    destroyRenderFrame(&renderFrame);
   }
-  renderContext->renderTargets.clear();
+  renderContext->renderFrames.clear();
 }

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "renderer/render_target.h"
+#include "renderer/render_frame.h"
 #include "renderer/swapchain.h"
 
 struct RenderContext {
-  std::vector<RenderTarget *> renderTargets;
+  std::vector<RenderFrame> renderFrames;
 };
 
 bool createRenderContext(RenderContext *renderContext, Swapchain *swapchain);
