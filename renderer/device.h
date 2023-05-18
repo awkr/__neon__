@@ -23,3 +23,6 @@ VkFormat chooseDepthFormat(VkPhysicalDevice physicalDevice,
 
 bool getMemoryTypeIndex(Device *device, uint32_t typeBits,
                         VkMemoryPropertyFlags property, uint32_t &typeIndex);
+
+bool isDepthOnlyFormat(VkFormat format);
+bool isDepthStencilFormat(VkFormat format);

@@ -16,8 +16,8 @@ bool createRenderContext(RenderContext *renderContext, Swapchain *swapchain) {
       return false;
     }
 
-    RenderFrame renderFrame{.renderTarget = renderTarget};
-    renderContext->renderFrames[i] = renderFrame;
+    RenderFrame renderFrame{.renderTarget = std::move(renderTarget)};
+    renderContext->renderFrames[i] = std::move(renderFrame);
   }
   return true;
 }

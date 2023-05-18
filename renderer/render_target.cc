@@ -15,10 +15,24 @@ const RenderTargetCreateFunc RENDER_TARGET_DEFAULT_CREATE_FUNC =
   renderTarget->images.emplace_back(color);
   renderTarget->images.emplace_back(depth);
 
+  for (auto &image : renderTarget->images) {
+    ImageView imageView{};
+    if (!createImageView(&imageView, &image)) {
+      return false;
+    }
+
+    renderTarget->imageViews.emplace_back(imageView);
+  }
+
   return true;
 };
 
 void destroyRenderTarget(RenderTarget *renderTarget) {
+  for (auto &imageView : renderTarget->imageViews) {
+    destroyImageView(&imageView);
+  }
+  renderTarget->imageViews.clear();
+
   for (auto &image : renderTarget->images) {
     destroyImage(&image);
   }

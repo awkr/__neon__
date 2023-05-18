@@ -1,10 +1,11 @@
 #pragma once
 
-#include "renderer/image.h"
+#include "renderer/image_view.h"
 #include <functional>
 
 struct RenderTarget {
   std::vector<Image> images;
+  std::vector<ImageView> imageViews;
 };
 
 using RenderTargetCreateFunc =
