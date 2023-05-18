@@ -15,7 +15,11 @@ add_executable(neon
     main.cc
     renderer/instance.cc
     renderer/device.cc
-    renderer/swapchain.cc)
+    renderer/swapchain.cc
+    renderer/image.cc
+    renderer/render_target.cc
+    renderer/ostream.cc
+    renderer/render_context.cc)
 
 target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan)
 

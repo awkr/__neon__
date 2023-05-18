@@ -1,6 +1,12 @@
 #include "renderer/device.h"
 #include "core/string_utils.h"
+#include "renderer/ostream.h"
+#include <iostream>
 #include <unordered_map>
+
+bool isDepthOnlyFormat(VkFormat format) {
+  return format == VK_FORMAT_D16_UNORM || format == VK_FORMAT_D32_SFLOAT;
+}
 
 bool createDevice(VkInstance instance, Device *device) {
   // pick a physical device
@@ -121,4 +127,52 @@ void destroyDevice(Device *device) {
   vkDestroyDevice(device->handle, nullptr);
   device->handle = VK_NULL_HANDLE;
   device->physicalDevice = VK_NULL_HANDLE;
+}
+
+VkFormat chooseDepthFormat(VkPhysicalDevice physicalDevice, bool depthOnly,
+                           const std::vector<VkFormat> &depthFormatPriority) {
+  VkFormat depthFormat{VK_FORMAT_UNDEFINED};
+
+  for (auto &format : depthFormatPriority) {
+    if (depthOnly && !isDepthOnlyFormat(format)) {
+      continue;
+    }
+
+    VkFormatProperties properties{};
+    vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &properties);
+
+    // format must support depth stencil attachment for optimal tiling
+    if (properties.optimalTilingFeatures &
+        VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT) {
+      depthFormat = format;
+      break;
+    }
+  }
+
+  if (depthFormat != VK_FORMAT_UNDEFINED) {
+    std::cout << "[Device] depth format selected " << depthFormat << std::endl;
+    return depthFormat;
+  }
+
+  throw std::runtime_error(
+      "[Device] no suitable depth format could be determined");
+}
+
+bool getMemoryTypeIndex(Device *device, uint32_t typeBits,
+                        VkMemoryPropertyFlags property, uint32_t &typeIndex) {
+  VkPhysicalDeviceMemoryProperties memoryProperties{};
+  vkGetPhysicalDeviceMemoryProperties(device->physicalDevice,
+                                      &memoryProperties);
+
+  for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i) {
+    if ((typeBits & 1) == 1) {
+      if ((memoryProperties.memoryTypes[i].propertyFlags & property) ==
+          property) {
+        typeIndex = i;
+        return true;
+      }
+    }
+    typeBits >>= 1;
+  }
+  return false;
 }

@@ -3,19 +3,6 @@
 #include "renderer/ostream.h"
 #include <iostream>
 
-struct SwapchainProperties {
-  VkExtent2D extent{};
-  uint16_t imageCount{3u};
-  uint32_t imageArrayLayers{1u};
-  VkSurfaceFormatKHR surfaceFormat{};
-  VkImageUsageFlags imageUsage{};
-  VkSurfaceTransformFlagBitsKHR preTransform{
-      VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR};
-  VkCompositeAlphaFlagBitsKHR compositeAlpha{VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR};
-  VkPresentModeKHR presentMode{VK_PRESENT_MODE_FIFO_KHR};
-  VkSwapchainKHR oldSwapchain{VK_NULL_HANDLE};
-};
-
 VkExtent2D chooseExtent(const VkExtent2D &requestExtent,
                         const VkExtent2D &minExtent,
                         const VkExtent2D &maxExtent,
@@ -143,6 +130,9 @@ bool createSwapchain(Swapchain *swapchain, Device *device, VkSurfaceKHR surface,
                            &swapchain->handle) != VK_SUCCESS) {
     return false;
   }
+
+  swapchain->device = device;
+  swapchain->properties = properties;
 
   uint32_t imageAvailable{0U};
   vkGetSwapchainImagesKHR(device->handle, swapchain->handle, &imageAvailable,
