@@ -156,12 +156,12 @@ VkFormat chooseDepthFormat(VkPhysicalDevice physicalDevice, bool depthOnly,
   }
 
   if (depthFormat != VK_FORMAT_UNDEFINED) {
-    std::cout << "[Device] depth format selected " << depthFormat << std::endl;
+    std::cout << "[Device] Depth format selected " << depthFormat << std::endl;
     return depthFormat;
   }
 
   throw std::runtime_error(
-      "[Device] no suitable depth format could be determined");
+      "[Device] No suitable depth format could be determined");
 }
 
 bool getMemoryTypeIndex(Device *device, uint32_t typeBits,

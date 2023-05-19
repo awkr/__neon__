@@ -18,7 +18,7 @@ Swapchain swapchain{};
 RenderContext renderContext{};
 
 int main() {
-  printf("hello, stranger.\n");
+  printf("Hello, stranger.\n");
 
   if (!glfwInit() || !glfwVulkanSupported()) {
     return 1;
@@ -88,6 +88,6 @@ int main() {
   glfwDestroyWindow(window);
   glfwTerminate();
 
-  printf("bye.\n");
+  printf("Bye.\n");
   return 0;
 }

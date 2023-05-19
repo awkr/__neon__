@@ -219,17 +219,17 @@ VkSurfaceFormatKHR chooseSurfaceFormat(
             return false;
           });
       if (it != availableSurfaceFormats.end()) {
-        std::cout << "[Swapchain] surface format " << requestedSurfaceFormat
+        std::cout << "[Swapchain] Surface format " << requestedSurfaceFormat
                   << " not supported. select " << *it << std::endl;
         return *it;
       }
     }
 
     it = availableSurfaceFormats.begin();
-    std::cout << "[Swapchain] surface format " << requestedSurfaceFormat
+    std::cout << "[Swapchain] Surface format " << requestedSurfaceFormat
               << " not supported. default to " << *it << std::endl;
   } else {
-    std::cout << "[Swapchain] surface format selected: "
+    std::cout << "[Swapchain] Surface format selected: "
               << requestedSurfaceFormat << std::endl;
   }
 
