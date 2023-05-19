@@ -14,9 +14,12 @@ VkInstance instance{VK_NULL_HANDLE};
 VkDebugUtilsMessengerEXT messenger{VK_NULL_HANDLE};
 VkSurfaceKHR surface{VK_NULL_HANDLE};
 Device device{};
-Swapchain swapchain{};
 
-RenderContext renderContext{};
+std::unique_ptr<RenderContext> renderContext{nullptr};
+
+void update() {
+  if (renderContext->begin()) {}
+}
 
 int main() {
   printf("Hello, stranger.\n");
@@ -49,15 +52,15 @@ int main() {
 
   if (!createDevice(instance, &device)) { return 1; }
 
-  int renderWidth{0}, renderHeight{0};
-  glfwGetFramebufferSize(window, &renderWidth, &renderHeight);
+  int width{0}, height{0};
+  glfwGetFramebufferSize(window, &width, &height);
 
-  if (!createSwapchain(&swapchain, &device, surface,
-                       {(uint32_t)renderWidth, (uint32_t)renderHeight}, 3)) {
-    return 1;
-  }
+  auto swapchain =
+      Swapchain::make(device, surface, {(uint32_t)width, (uint32_t)height}, 3);
+  if (!swapchain) { return 1; }
 
-  if (!createRenderContext(&renderContext, &swapchain)) { return 1; }
+  renderContext = RenderContext::make(std::move(swapchain));
+  if (!renderContext) { return 1; }
 
   ShaderSource vertShader{};
   ShaderSource fragShader{};
@@ -67,20 +70,20 @@ int main() {
   }
 
   auto sceneSubpass = std::make_unique<ForwardSubpass>(
-      &renderContext, std::move(vertShader), std::move(fragShader));
+      renderContext.get(), std::move(vertShader), std::move(fragShader));
 
   auto renderPipeline = std::make_unique<RenderPipeline>();
   renderPipeline->addSubpass(std::move(sceneSubpass));
 
   while (!glfwWindowShouldClose(window)) {
+    update();
     glfwPollEvents();
   }
 
   renderPipeline.reset();
 
-  destroyRenderContext(&renderContext);
+  renderContext.reset();
 
-  destroySwapchain(device.handle, &swapchain);
   destroyDevice(&device);
   vkDestroySurfaceKHR(instance, surface, nullptr);
   surface = VK_NULL_HANDLE;

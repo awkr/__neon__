@@ -8,7 +8,7 @@ ForwardSubpass::ForwardSubpass(RenderContext *renderContext,
                       std::move(fragmentShader)) {}
 
 void ForwardSubpass::prepare() {
-  auto &cache = renderContext->resourceCache;
+  auto &cache = renderContext->getResourceCache();
 
   for (auto mesh : meshes) {
     for (auto subMesh : mesh->subMeshes) {
@@ -20,7 +20,4 @@ void ForwardSubpass::prepare() {
                                 variant);
     }
   }
-
-  cache.requestShaderModule(VK_SHADER_STAGE_VERTEX_BIT, vertexShader, {});
-  cache.requestShaderModule(VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader, {});
 }
