@@ -6,7 +6,7 @@ struct RenderPipeline {
 public:
   ~RenderPipeline();
 
-  void addSubpass(Subpass *subpass);
+  void addSubpass(std::unique_ptr<Subpass> &&subpass);
 
 private:
   std::vector<VkClearValue> clearValue{
@@ -14,5 +14,5 @@ private:
       {.depthStencil = {0, ~0U}},
   };
 
-  std::vector<Subpass *> subpasses;
+  std::vector<std::unique_ptr<Subpass>> subpasses;
 };

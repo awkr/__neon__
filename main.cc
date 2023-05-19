@@ -17,7 +17,6 @@ Device device{};
 Swapchain swapchain{};
 
 RenderContext renderContext{};
-RenderPipeline renderPipeline{};
 
 int main() {
   printf("Hello, stranger.\n");
@@ -67,14 +66,17 @@ int main() {
     return 1;
   }
 
-  auto sceneSubpass = new ForwardSubpass(&renderContext, std::move(vertShader),
-                                         std::move(fragShader));
+  auto sceneSubpass = std::make_unique<ForwardSubpass>(
+      &renderContext, std::move(vertShader), std::move(fragShader));
 
-  renderPipeline.addSubpass(sceneSubpass);
+  auto renderPipeline = std::make_unique<RenderPipeline>();
+  renderPipeline->addSubpass(std::move(sceneSubpass));
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
   }
+
+  renderPipeline.reset();
 
   destroyRenderContext(&renderContext);
 

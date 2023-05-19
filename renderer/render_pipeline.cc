@@ -1,13 +1,8 @@
 #include "renderer/render_pipeline.h"
 
-RenderPipeline::~RenderPipeline() {
-  for (auto subpass : subpasses) {
-    delete subpass;
-  }
-  subpasses.clear();
-}
+RenderPipeline::~RenderPipeline() { subpasses.clear(); }
 
-void RenderPipeline::addSubpass(Subpass *subpass) {
+void RenderPipeline::addSubpass(std::unique_ptr<Subpass> &&subpass) {
   subpass->prepare();
-  subpasses.emplace_back(subpass);
+  subpasses.emplace_back(std::move(subpass));
 }
