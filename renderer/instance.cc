@@ -1,7 +1,6 @@
 #include "renderer/instance.h"
 #include "core/string_utils.h"
 #include <unordered_map>
-#include <vector>
 #include <vulkan/vulkan_metal.h>
 
 VKAPI_ATTR VkBool32 VKAPI_CALL messengerCallback(

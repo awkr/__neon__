@@ -10,6 +10,11 @@ set(GLFW_INSTALL OFF CACHE BOOL "")
 add_subdirectory(third-party/glfw)
 add_subdirectory(third-party/glm)
 
+set(ENABLE_GLSLANG_BINARIES OFF CACHE BOOL "")
+set(ENABLE_CTEST OFF CACHE BOOL "")
+
+add_subdirectory(third-party/glslang)
+
 find_package(Vulkan REQUIRED)
 
 add_executable(neon
@@ -30,6 +35,6 @@ add_executable(neon
     renderer/render_pipeline.cc
     renderer/resource_cache.cc)
 
-target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan glm)
+target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan glm glslang glslang-default-resource-limits SPIRV)
 
 target_include_directories(neon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

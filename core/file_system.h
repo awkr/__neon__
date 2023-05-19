@@ -3,11 +3,9 @@
 #include <fstream>
 #include <sstream>
 
-bool readTextFile(const std::string &filepath, std::string &source) {
+bool readFile(const std::string &filepath, std::string &source) {
   std::ifstream fs(filepath);
-  if (!fs.is_open()) {
-    return false;
-  }
+  if (!fs.is_open()) { return false; }
 
   std::stringstream ss;
   ss << fs.rdbuf();

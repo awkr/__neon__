@@ -18,9 +18,7 @@ bool createDevice(VkInstance instance, Device *device) {
   // pick a physical device
   uint32_t physicalDeviceCount{0};
   vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr);
-  if (physicalDeviceCount < 1) {
-    return false;
-  }
+  if (physicalDeviceCount < 1) { return false; }
 
   std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
   vkEnumeratePhysicalDevices(instance, &physicalDeviceCount,
@@ -140,9 +138,7 @@ VkFormat chooseDepthFormat(VkPhysicalDevice physicalDevice, bool depthOnly,
   VkFormat depthFormat{VK_FORMAT_UNDEFINED};
 
   for (auto &format : depthFormatPriority) {
-    if (depthOnly && !isDepthOnlyFormat(format)) {
-      continue;
-    }
+    if (depthOnly && !isDepthOnlyFormat(format)) { continue; }
 
     VkFormatProperties properties{};
     vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &properties);

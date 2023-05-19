@@ -161,9 +161,7 @@ VkExtent2D chooseExtent(const VkExtent2D &requestExtent,
     return currentExtent;
   }
 
-  if (currentExtent.width == 0xFFFFFFFF) {
-    return requestExtent;
-  }
+  if (currentExtent.width == 0xFFFFFFFF) { return requestExtent; }
 
   VkExtent2D extent{};
 
@@ -299,9 +297,7 @@ VkSurfaceTransformFlagBitsKHR
 chooseTransform(VkSurfaceTransformFlagBitsKHR requestTransform,
                 VkSurfaceTransformFlagsKHR supportedTransform,
                 VkSurfaceTransformFlagBitsKHR currentTransform) {
-  if (requestTransform & supportedTransform) {
-    return requestTransform;
-  }
+  if (requestTransform & supportedTransform) { return requestTransform; }
 
   std::cout << "[Swapchain] surface transform " << requestTransform
             << " not supported. select " << currentTransform;

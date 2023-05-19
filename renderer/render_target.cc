@@ -17,9 +17,7 @@ const RenderTargetCreateFunc RENDER_TARGET_DEFAULT_CREATE_FUNC =
 
   for (auto &image : renderTarget->images) {
     ImageView imageView{};
-    if (!createImageView(&imageView, &image)) {
-      return false;
-    }
+    if (!createImageView(&imageView, &image)) { return false; }
 
     renderTarget->imageViews.emplace_back(imageView);
   }

@@ -20,4 +20,7 @@ void ForwardSubpass::prepare() {
                                 variant);
     }
   }
+
+  cache.requestShaderModule(VK_SHADER_STAGE_VERTEX_BIT, vertexShader, {});
+  cache.requestShaderModule(VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader, {});
 }

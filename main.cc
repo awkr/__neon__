@@ -22,9 +22,7 @@ RenderPipeline renderPipeline{};
 int main() {
   printf("Hello, stranger.\n");
 
-  if (!glfwInit() || !glfwVulkanSupported()) {
-    return 1;
-  }
+  if (!glfwInit() || !glfwVulkanSupported()) { return 1; }
 
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
@@ -43,18 +41,14 @@ int main() {
     }
   });
 
-  if (!createInstance(&instance, &messenger)) {
-    return 1;
-  }
+  if (!createInstance(&instance, &messenger)) { return 1; }
 
   if (glfwCreateWindowSurface(instance, window, nullptr, &surface) !=
       VK_SUCCESS) {
     return 1;
   }
 
-  if (!createDevice(instance, &device)) {
-    return 1;
-  }
+  if (!createDevice(instance, &device)) { return 1; }
 
   int renderWidth{0}, renderHeight{0};
   glfwGetFramebufferSize(window, &renderWidth, &renderHeight);
@@ -64,9 +58,7 @@ int main() {
     return 1;
   }
 
-  if (!createRenderContext(&renderContext, &swapchain)) {
-    return 1;
-  }
+  if (!createRenderContext(&renderContext, &swapchain)) { return 1; }
 
   ShaderSource vertShader{};
   ShaderSource fragShader{};

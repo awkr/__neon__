@@ -20,7 +20,7 @@ inline void hashParam(size_t &seed, const T &arg, const Args &...args) {
 }
 
 struct ResourceCacheState {
-  std::unordered_map<std::size_t, ShaderModule> shaderModules;
+  std::unordered_map<std::size_t, std::unique_ptr<ShaderModule>> shaderModules;
 };
 
 class ResourceCache {

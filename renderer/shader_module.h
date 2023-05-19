@@ -20,6 +20,8 @@ public:
   void addDefinition(const std::pair<std::string, std::string> &definition);
 
   uint64_t getId() const { return id; }
+  const std::string &getPreamble() const { return preamble; }
+  const std::vector<std::string> &getProcesses() const { return processes; }
 
 private:
   void updateId();
@@ -29,15 +31,19 @@ private:
   std::vector<std::string> processes;
 };
 
+struct ShaderResource {};
+
 struct ShaderModule : public Resource {
 public:
-  ShaderModule(VkShaderStageFlagBits stage, const ShaderSource &source,
-               const std::string &entry, const ShaderVariant &variant);
-
   uint64_t getId() const { return id; }
 
-  bool prepare() override;
+  static std::unique_ptr<ShaderModule> make(VkShaderStageFlagBits stage,
+                                            const ShaderSource &source,
+                                            const std::string &entry,
+                                            const ShaderVariant &variant);
 
 private:
   uint64_t id{0};
+  std::vector<uint32_t> spirv;
+  std::vector<ShaderResource> resources;
 };
