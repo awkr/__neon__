@@ -71,3 +71,23 @@ bool CommandPool::requestCommandBuffer(CommandBuffer **commandBuffer,
   *commandBuffer = secondaryCommandBuffers.back().get();
   return true;
 }
+
+void CommandPool::resetPool() {
+  switch (resetMode) {
+  case CommandBufferResetMode::ResetPool:
+    resetCommandBuffers();
+    break;
+  case CommandBufferResetMode::ResetIndividually:
+    // TODO
+    break;
+  case CommandBufferResetMode::AlwaysAllocate:
+    // TODO
+    break;
+  }
+}
+
+void CommandPool::resetCommandBuffers() {
+  for (auto &commandBuffer : primaryCommandBuffers) {
+    commandBuffer->reset(resetMode);
+  }
+}

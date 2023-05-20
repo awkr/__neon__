@@ -3,7 +3,7 @@
 
 RenderFrame::RenderFrame(Device &device, RenderTarget &&renderTarget,
                          size_t threadCount)
-    : device{device}, semaphorePool{device},
+    : device{device}, semaphorePool{device}, fencePool{device},
       renderTarget{std::move(renderTarget)}, threadCount{threadCount} {}
 
 RenderFrame::~RenderFrame() { destroyRenderTarget(&renderTarget); }
@@ -12,17 +12,21 @@ bool RenderFrame::requestOutSemaphore(VkSemaphore &semaphore) {
   return semaphorePool.requestOutSemaphore(semaphore);
 }
 
+bool RenderFrame::requestSemaphore(VkSemaphore &semaphore) {
+  return semaphorePool.requestSemaphore(semaphore);
+}
+
 void RenderFrame::releaseSemaphore(VkSemaphore semaphore) {
   semaphorePool.releaseSemaphore(semaphore);
 }
 
 bool RenderFrame::requestCommandBuffer(CommandBuffer **commandBuffer,
-                                       Queue &queue,
+                                       Queue *queue,
                                        CommandBufferResetMode resetMode,
                                        VkCommandBufferLevel level,
                                        size_t threadIndex) {
   std::vector<std::unique_ptr<CommandPool>> *commandPool{nullptr};
-  bool ok = getCommandPool(queue, resetMode, &commandPool);
+  bool ok = getCommandPool(*queue, resetMode, &commandPool);
   if (!ok) { return false; }
   auto it =
       std::find_if(commandPool->begin(), commandPool->end(),
@@ -32,7 +36,20 @@ bool RenderFrame::requestCommandBuffer(CommandBuffer **commandBuffer,
   return (*it)->requestCommandBuffer(commandBuffer, level);
 }
 
-void RenderFrame::reset() { semaphorePool.reset(); }
+bool RenderFrame::requestFence(VkFence &fence) {
+  return fencePool.requestFence(fence);
+}
+
+void RenderFrame::reset() {
+  fencePool.wait();
+  fencePool.reset();
+  for (auto &queueCommandPools : commandPools) {
+    for (auto &commandPool : queueCommandPools.second) {
+      commandPool->resetPool();
+    }
+  }
+  semaphorePool.reset();
+}
 
 bool RenderFrame::getCommandPool(
     const Queue &queue, CommandBufferResetMode resetMode,

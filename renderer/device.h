@@ -4,15 +4,16 @@
 #include <vector>
 
 struct Device {
-  bool getQueue(VkQueueFlags requiredFlags, uint32_t index, Queue &queue) const;
-  VkResult waitIdle() const;
+  bool getQueue(VkQueueFlags requiredFlags, uint32_t index, Queue **queue);
+  bool waitIdle() const;
+  bool getGraphicsQueue(Queue **queue);
 
   VkPhysicalDevice physicalDevice{VK_NULL_HANDLE};
   VkDevice handle{VK_NULL_HANDLE};
   std::vector<std::vector<Queue>> queues;
 };
 
-bool createDevice(VkInstance instance, Device *device);
+bool createDevice(VkInstance instance, Device *device, VkSurfaceKHR surface);
 
 void destroyDevice(Device *device);
 

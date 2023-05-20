@@ -15,5 +15,7 @@ struct CommandBuffer {
   static std::unique_ptr<CommandBuffer> make(CommandPool *commandPool,
                                              VkCommandBufferLevel level);
 
+  void reset(CommandBufferResetMode resetMode);
+
   VkCommandBuffer handle{VK_NULL_HANDLE};
 };

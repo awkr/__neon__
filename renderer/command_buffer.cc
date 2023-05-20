@@ -20,3 +20,7 @@ std::unique_ptr<CommandBuffer> CommandBuffer::make(CommandPool *commandPool,
   commandBuffer->handle = handle;
   return std::move(commandBuffer);
 }
+
+void CommandBuffer::reset(CommandBufferResetMode resetMode) {
+  // TODO
+}

@@ -53,7 +53,7 @@ int main() {
     return 1;
   }
 
-  if (!createDevice(instance, &device)) { return 1; }
+  if (!createDevice(instance, &device, surface)) { return 1; }
 
   int width{0}, height{0};
   glfwGetFramebufferSize(window, &width, &height);

@@ -18,6 +18,9 @@ struct CommandPool {
       CommandBuffer **commandBuffer,
       VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
+  void resetPool();
+  void resetCommandBuffers();
+
   Device &device;
   CommandBufferResetMode resetMode{CommandBufferResetMode::ResetPool};
   VkCommandPool handle{VK_NULL_HANDLE};

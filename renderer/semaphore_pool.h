@@ -9,6 +9,7 @@ struct SemaphorePool {
   SemaphorePool(Device &device) : device{device} {}
   ~SemaphorePool();
   bool requestOutSemaphore(VkSemaphore &semaphore);
+  bool requestSemaphore(VkSemaphore &semaphore);
   void releaseSemaphore(VkSemaphore semaphore);
   void reset();
 

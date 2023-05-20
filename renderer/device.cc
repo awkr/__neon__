@@ -14,7 +14,7 @@ bool isDepthStencilFormat(VkFormat format) {
          format == VK_FORMAT_D32_SFLOAT_S8_UINT || isDepthOnlyFormat(format);
 }
 
-bool createDevice(VkInstance instance, Device *device) {
+bool createDevice(VkInstance instance, Device *device, VkSurfaceKHR surface) {
   // pick a physical device
   uint32_t physicalDeviceCount{0};
   vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr);
@@ -119,10 +119,15 @@ bool createDevice(VkInstance instance, Device *device) {
       VkQueue handle{VK_NULL_HANDLE};
       vkGetDeviceQueue(device->handle, queueFamilyIndex, queueIndex, &handle);
 
+      VkBool32 supportPresent{VK_FALSE};
+      vkGetPhysicalDeviceSurfaceSupportKHR(
+          device->physicalDevice, queueFamilyIndex, surface, &supportPresent);
+
       Queue queue{
           .handle = handle,
           .familyIndex = queueFamilyIndex,
           .properties = queueFamilyProperty,
+          .supportPresent = supportPresent,
       };
       device->queues[queueFamilyIndex].emplace_back(queue);
     }
@@ -185,7 +190,7 @@ bool getMemoryTypeIndex(Device *device, uint32_t typeBits,
 }
 
 bool Device::getQueue(VkQueueFlags requiredFlags, uint32_t index,
-                      Queue &queue) const {
+                      Queue **queue) {
   for (uint32_t queueFamilyIndex = 0U; queueFamilyIndex < queues.size();
        ++queueFamilyIndex) {
     const auto &q = queues[queueFamilyIndex][0];
@@ -194,7 +199,7 @@ bool Device::getQueue(VkQueueFlags requiredFlags, uint32_t index,
     uint32_t queueCount = q.properties.queueCount;
 
     if (((queueFlags & requiredFlags) == requiredFlags) && index < queueCount) {
-      queue = queues[queueFamilyIndex][index];
+      *queue = &queues[queueFamilyIndex][index];
       return true;
     }
   }
@@ -202,4 +207,16 @@ bool Device::getQueue(VkQueueFlags requiredFlags, uint32_t index,
   return false;
 }
 
-VkResult Device::waitIdle() const { return vkDeviceWaitIdle(handle); }
+bool Device::waitIdle() const { return vkDeviceWaitIdle(handle) == VK_SUCCESS; }
+
+bool Device::getGraphicsQueue(Queue **queue) {
+  for (uint32_t queueFamilyIndex = 0; queueFamilyIndex < queues.size();
+       ++queueFamilyIndex) {
+    auto &q = queues[queueFamilyIndex].front();
+    if (q.supportPresent && q.properties.queueCount > 0) {
+      *queue = &q;
+      return true;
+    }
+  }
+  return getQueue(VK_QUEUE_GRAPHICS_BIT, 0, queue);
+}
