@@ -3,6 +3,8 @@ Language: Cpp
 BasedOnStyle: LLVM
 AllowShortBlocksOnASingleLine: Always
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
+AllowShortEnumsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: All
 
 #AccessModifierOffset: -2
 #AlignAfterOpenBracket: Align
@@ -33,8 +35,6 @@ AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 #AllowAllParametersOfDeclarationOnNextLine: true
 #
 #AllowShortCaseLabelsOnASingleLine: false
-#AllowShortEnumsOnASingleLine: true
-#AllowShortFunctionsOnASingleLine: All
 #
 #AllowShortLambdasOnASingleLine: All
 #AllowShortLoopsOnASingleLine: false

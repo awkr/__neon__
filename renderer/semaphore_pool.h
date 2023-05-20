@@ -7,8 +7,10 @@ struct Device;
 
 struct SemaphorePool {
   SemaphorePool(Device &device) : device{device} {}
-  bool requestOwnedSemaphore(VkSemaphore &semaphore);
+  ~SemaphorePool();
+  bool requestOutSemaphore(VkSemaphore &semaphore);
   void releaseSemaphore(VkSemaphore semaphore);
+  void reset();
 
 private:
   Device &device;

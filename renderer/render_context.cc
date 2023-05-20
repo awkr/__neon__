@@ -1,4 +1,5 @@
 #include "renderer/render_context.h"
+#include "renderer/device.h"
 
 std::unique_ptr<RenderContext>
 RenderContext::make(std::unique_ptr<Swapchain> &&swapchain) {
@@ -35,20 +36,23 @@ RenderContext::~RenderContext() {
   swapchain.reset();
 }
 
-bool RenderContext::begin() {
+bool RenderContext::begin(CommandBuffer **commandBuffer) {
   if (!beginFrame()) { return false; }
-  // CommandBufferResetMode resetMode = CommandBufferResetMode::RestPool
+  Queue queue{};
+  if (!device->getQueue(VK_QUEUE_GRAPHICS_BIT, 0, queue)) { return false; }
+  bool ok = getActiveFrame()->requestCommandBuffer(
+      commandBuffer, queue, CommandBufferResetMode::ResetPool);
+  if (!ok) { return false; }
   return true;
 }
 
-void RenderContext::submit() { endFrame(); }
+void RenderContext::submit(CommandBuffer *commandBuffer) { endFrame(); }
 
 bool RenderContext::beginFrame() {
-  auto &frame = frames[activeFrameIndex];
-  if (!frame->requestOwnedSemaphore(imageAcquiredSemaphore)) { return false; }
+  auto frame = getActiveFrame();
+  if (!frame->requestOutSemaphore(acquiredSemaphore)) { return false; }
 
-  auto result =
-      swapchain->acquireImage(activeFrameIndex, imageAcquiredSemaphore);
+  auto result = swapchain->acquireImage(activeFrameIndex, acquiredSemaphore);
   if (result != VK_SUCCESS) { return false; }
 
   waitFrame();
@@ -57,9 +61,12 @@ bool RenderContext::beginFrame() {
 }
 
 void RenderContext::endFrame() {
-  auto &frame = frames[activeFrameIndex];
-  frame->releaseSemaphore(imageAcquiredSemaphore);
-  imageAcquiredSemaphore = VK_NULL_HANDLE;
+  getActiveFrame()->releaseSemaphore(acquiredSemaphore);
+  acquiredSemaphore = VK_NULL_HANDLE;
 }
 
-void RenderContext::waitFrame() {}
+void RenderContext::waitFrame() { getActiveFrame()->reset(); }
+
+RenderFrame *RenderContext::getActiveFrame() {
+  return frames[activeFrameIndex].get();
+}

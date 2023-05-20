@@ -1,12 +1,15 @@
 #pragma once
 
+#include "renderer/queue.h"
 #include <vector>
-#include <vulkan/vulkan.h>
 
 struct Device {
+  bool getQueue(VkQueueFlags requiredFlags, uint32_t index, Queue &queue) const;
+  VkResult waitIdle() const;
+
   VkPhysicalDevice physicalDevice{VK_NULL_HANDLE};
   VkDevice handle{VK_NULL_HANDLE};
-  std::vector<std::vector<VkQueue>> queues;
+  std::vector<std::vector<Queue>> queues;
 };
 
 bool createDevice(VkInstance instance, Device *device);

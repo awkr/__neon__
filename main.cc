@@ -15,10 +15,13 @@ VkDebugUtilsMessengerEXT messenger{VK_NULL_HANDLE};
 VkSurfaceKHR surface{VK_NULL_HANDLE};
 Device device{};
 
-std::unique_ptr<RenderContext> renderContext{nullptr};
+std::unique_ptr<RenderContext> renderContext;
 
 void update() {
-  if (renderContext->begin()) {}
+  if (CommandBuffer * commandBuffer{nullptr};
+      renderContext->begin(&commandBuffer)) {
+    renderContext->submit(commandBuffer);
+  }
 }
 
 int main() {

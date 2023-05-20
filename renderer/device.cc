@@ -116,9 +116,14 @@ bool createDevice(VkInstance instance, Device *device) {
     const auto &queueFamilyProperty = queueFamilyProperties[queueFamilyIndex];
     for (uint32_t queueIndex = 0U; queueIndex < queueFamilyProperty.queueCount;
          ++queueIndex) {
-      VkQueue queue{VK_NULL_HANDLE};
-      vkGetDeviceQueue(device->handle, queueFamilyIndex, queueIndex, &queue);
+      VkQueue handle{VK_NULL_HANDLE};
+      vkGetDeviceQueue(device->handle, queueFamilyIndex, queueIndex, &handle);
 
+      Queue queue{
+          .handle = handle,
+          .familyIndex = queueFamilyIndex,
+          .properties = queueFamilyProperty,
+      };
       device->queues[queueFamilyIndex].emplace_back(queue);
     }
   }
@@ -178,3 +183,23 @@ bool getMemoryTypeIndex(Device *device, uint32_t typeBits,
   }
   return false;
 }
+
+bool Device::getQueue(VkQueueFlags requiredFlags, uint32_t index,
+                      Queue &queue) const {
+  for (uint32_t queueFamilyIndex = 0U; queueFamilyIndex < queues.size();
+       ++queueFamilyIndex) {
+    const auto &q = queues[queueFamilyIndex][0];
+
+    auto queueFlags = q.properties.queueFlags;
+    uint32_t queueCount = q.properties.queueCount;
+
+    if (((queueFlags & requiredFlags) == requiredFlags) && index < queueCount) {
+      queue = queues[queueFamilyIndex][index];
+      return true;
+    }
+  }
+
+  return false;
+}
+
+VkResult Device::waitIdle() const { return vkDeviceWaitIdle(handle); }

@@ -12,8 +12,8 @@ public:
 
   ~RenderContext();
 
-  bool begin();
-  void submit();
+  bool begin(CommandBuffer **commandBuffer);
+  void submit(CommandBuffer *commandBuffer);
 
   ResourceCache &getResourceCache() { return resourceCache; }
 
@@ -23,12 +23,14 @@ private:
 
   void waitFrame();
 
+  RenderFrame *getActiveFrame();
+
   Device *device;
   std::unique_ptr<Swapchain> swapchain;
   std::vector<std::unique_ptr<RenderFrame>> frames;
 
   ResourceCache resourceCache{};
 
-  VkSemaphore imageAcquiredSemaphore{VK_NULL_HANDLE};
+  VkSemaphore acquiredSemaphore{VK_NULL_HANDLE};
   uint32_t activeFrameIndex{0U};
 };
