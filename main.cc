@@ -83,6 +83,8 @@ int main() {
     glfwPollEvents();
   }
 
+  device.waitIdle();
+
   renderPipeline.reset();
 
   renderContext.reset();

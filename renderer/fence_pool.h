@@ -7,9 +7,9 @@ struct Device;
 
 struct FencePool {
   FencePool(Device &device) : device{device} {}
-
+  ~FencePool();
   bool requestFence(VkFence &fence);
-  void wait(uint64_t timeout = UINT64_MAX);
+  bool wait(uint64_t timeout = UINT64_MAX);
   bool reset();
 
   Device &device;
