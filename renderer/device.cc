@@ -190,7 +190,7 @@ bool getMemoryTypeIndex(Device *device, uint32_t typeBits,
 }
 
 bool Device::getQueue(VkQueueFlags requiredFlags, uint32_t index,
-                      Queue **queue) {
+                      const Queue **queue) const {
   for (uint32_t queueFamilyIndex = 0U; queueFamilyIndex < queues.size();
        ++queueFamilyIndex) {
     const auto &q = queues[queueFamilyIndex][0];
@@ -209,7 +209,7 @@ bool Device::getQueue(VkQueueFlags requiredFlags, uint32_t index,
 
 bool Device::waitIdle() const { return vkDeviceWaitIdle(handle) == VK_SUCCESS; }
 
-bool Device::getGraphicsQueue(Queue **queue) {
+bool Device::getGraphicsQueue(const Queue **queue) const {
   for (uint32_t queueFamilyIndex = 0; queueFamilyIndex < queues.size();
        ++queueFamilyIndex) {
     auto &q = queues[queueFamilyIndex].front();

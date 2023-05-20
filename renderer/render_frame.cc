@@ -21,12 +21,12 @@ void RenderFrame::releaseSemaphore(VkSemaphore semaphore) {
 }
 
 bool RenderFrame::requestCommandBuffer(CommandBuffer **commandBuffer,
-                                       Queue *queue,
+                                       const Queue *queue,
                                        CommandBufferResetMode resetMode,
                                        VkCommandBufferLevel level,
                                        size_t threadIndex) {
   std::vector<std::unique_ptr<CommandPool>> *commandPool{nullptr};
-  bool ok = getCommandPool(*queue, resetMode, &commandPool);
+  bool ok = getCommandPool(queue, resetMode, &commandPool);
   if (!ok) { return false; }
   auto it =
       std::find_if(commandPool->begin(), commandPool->end(),
@@ -52,9 +52,9 @@ void RenderFrame::reset() {
 }
 
 bool RenderFrame::getCommandPool(
-    const Queue &queue, CommandBufferResetMode resetMode,
+    const Queue *queue, CommandBufferResetMode resetMode,
     std::vector<std::unique_ptr<CommandPool>> **commandPool) {
-  if (auto it = commandPools.find(queue.familyIndex);
+  if (auto it = commandPools.find(queue->familyIndex);
       it != commandPools.end()) {
     if (it->second.front()->resetMode != resetMode) {
       device.waitIdle();
@@ -66,13 +66,13 @@ bool RenderFrame::getCommandPool(
   }
   std::vector<std::unique_ptr<CommandPool>> queueCommandPools;
   for (size_t i = 0; i < threadCount; ++i) {
-    auto pool = CommandPool::make(device, queue.familyIndex, resetMode);
+    auto pool = CommandPool::make(device, queue->familyIndex, resetMode);
     if (!pool) { return false; }
     queueCommandPools.emplace_back(std::move(pool));
   }
 
   auto it =
-      commandPools.emplace(queue.familyIndex, std::move(queueCommandPools));
+      commandPools.emplace(queue->familyIndex, std::move(queueCommandPools));
   if (!it.second) { return false; }
   *commandPool = &(it.first->second);
   return true;

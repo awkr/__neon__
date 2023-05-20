@@ -6,6 +6,6 @@ bool Queue::submit(const std::vector<VkSubmitInfo> &submitInfos,
          VK_SUCCESS;
 }
 
-void Queue::present(const VkPresentInfoKHR &presentInfo) const {
-  vkQueuePresentKHR(handle, &presentInfo);
+bool Queue::present(const VkPresentInfoKHR &presentInfo) const {
+  return vkQueuePresentKHR(handle, &presentInfo) == VK_SUCCESS;
 }

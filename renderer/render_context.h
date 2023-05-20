@@ -5,8 +5,6 @@
 #include "renderer/resource_cache.h"
 #include "renderer/swapchain.h"
 
-#define out **
-
 struct RenderContext {
 public:
   static std::unique_ptr<RenderContext>
@@ -15,18 +13,17 @@ public:
   ~RenderContext();
 
   bool begin(CommandBuffer **commandBuffer);
-  //  bool begin(CommandBuffer out commandBuffer);
   bool submit(CommandBuffer *commandBuffer);
 
   ResourceCache &getResourceCache() { return resourceCache; }
 
 private:
   bool beginFrame();
-  void endFrame(VkSemaphore semaphore);
+  bool endFrame(VkSemaphore waitSemaphore);
 
   void waitFrame();
 
-  bool submit(const Queue *queue,
+  bool submit(const Queue &graphicsQueue,
               const std::vector<CommandBuffer *> &commandBuffers,
               VkSemaphore waitSemaphore, VkPipelineStageFlags waitPipelineStage,
               VkSemaphore &renderCompleteSemaphore);
@@ -36,7 +33,7 @@ private:
   Device *device;
   std::unique_ptr<Swapchain> swapchain;
   std::vector<std::unique_ptr<RenderFrame>> frames;
-  Queue *queue{nullptr};
+  const Queue *queue{nullptr}; // a present supported queue
 
   ResourceCache resourceCache{};
 

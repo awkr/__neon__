@@ -4,9 +4,10 @@
 #include <vector>
 
 struct Device {
-  bool getQueue(VkQueueFlags requiredFlags, uint32_t index, Queue **queue);
+  bool getQueue(VkQueueFlags requiredFlags, uint32_t index,
+                const Queue **queue) const;
   bool waitIdle() const;
-  bool getGraphicsQueue(Queue **queue);
+  bool getGraphicsQueue(const Queue **queue) const;
 
   VkPhysicalDevice physicalDevice{VK_NULL_HANDLE};
   VkDevice handle{VK_NULL_HANDLE};

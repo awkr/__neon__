@@ -19,7 +19,7 @@ struct RenderFrame {
   void releaseSemaphore(VkSemaphore semaphore);
 
   bool requestCommandBuffer(
-      CommandBuffer **commandBuffer, Queue *queue,
+      CommandBuffer **commandBuffer, const Queue *queue,
       CommandBufferResetMode resetMode = CommandBufferResetMode::ResetPool,
       VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
       size_t threadIndex = 0);
@@ -28,7 +28,7 @@ struct RenderFrame {
   void reset();
 
 private:
-  bool getCommandPool(const Queue &queue, CommandBufferResetMode resetMode,
+  bool getCommandPool(const Queue *queue, CommandBufferResetMode resetMode,
                       std::vector<std::unique_ptr<CommandPool>> **commandPool);
 
   Device &device;

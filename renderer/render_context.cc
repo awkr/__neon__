@@ -24,7 +24,7 @@ RenderContext::make(std::unique_ptr<Swapchain> &&swapchain) {
     renderFrames[i] = std::move(renderFrame);
   }
 
-  Queue *queue{nullptr};
+  const Queue *queue{nullptr};
   if (!swapchain->device->getGraphicsQueue(&queue)) { return nullptr; }
 
   auto renderContext = std::make_unique<RenderContext>();
@@ -42,17 +42,19 @@ RenderContext::~RenderContext() {
 
 bool RenderContext::begin(CommandBuffer **commandBuffer) {
   if (!beginFrame()) { return false; }
-  Queue *queue{nullptr};
-  if (!device->getQueue(VK_QUEUE_GRAPHICS_BIT, 0, &queue)) { return false; }
+  const Queue *graphicsQueue{nullptr};
+  if (!device->getQueue(VK_QUEUE_GRAPHICS_BIT, 0, &graphicsQueue)) {
+    return false;
+  }
   bool ok = getActiveFrame()->requestCommandBuffer(
-      commandBuffer, queue, CommandBufferResetMode::ResetPool);
+      commandBuffer, graphicsQueue, CommandBufferResetMode::ResetPool);
   if (!ok) { return false; }
   return true;
 }
 
 bool RenderContext::submit(CommandBuffer *commandBuffer) {
   VkSemaphore renderCompleteSemaphore{VK_NULL_HANDLE};
-  if (!submit(queue, {commandBuffer}, acquiredSemaphore,
+  if (!submit(*queue, {commandBuffer}, acquiredSemaphore,
               VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
               renderCompleteSemaphore)) {
     return false;
@@ -75,24 +77,25 @@ bool RenderContext::beginFrame() {
   return true;
 }
 
-void RenderContext::endFrame(VkSemaphore semaphore) {
+bool RenderContext::endFrame(VkSemaphore waitSemaphore) {
   VkPresentInfoKHR presentInfo{VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
 
   presentInfo.waitSemaphoreCount = 1;
-  presentInfo.pWaitSemaphores = &semaphore;
+  presentInfo.pWaitSemaphores = &waitSemaphore;
   presentInfo.swapchainCount = 1;
   presentInfo.pSwapchains = &swapchain->handle;
   presentInfo.pImageIndices = &activeFrameIndex;
 
-  queue->present(presentInfo);
+  if (!queue->present(presentInfo)) { return false; }
 
   getActiveFrame()->releaseSemaphore(acquiredSemaphore);
   acquiredSemaphore = VK_NULL_HANDLE;
+  return true;
 }
 
 void RenderContext::waitFrame() { getActiveFrame()->reset(); }
 
-bool RenderContext::submit(const Queue *queue,
+bool RenderContext::submit(const Queue &graphicsQueue,
                            const std::vector<CommandBuffer *> &commandBuffers,
                            VkSemaphore waitSemaphore,
                            VkPipelineStageFlags waitPipelineStage,
@@ -110,8 +113,8 @@ bool RenderContext::submit(const Queue *queue,
   if (!frame->requestSemaphore(signalSemaphore)) { return false; }
 
   VkSubmitInfo submitInfo{VK_STRUCTURE_TYPE_SUBMIT_INFO};
-  //  submitInfo.commandBufferCount = commandBufferHandles.size();
-  //  submitInfo.pCommandBuffers = commandBufferHandles.data();
+  // submitInfo.commandBufferCount = commandBufferHandles.size();
+  // submitInfo.pCommandBuffers = commandBufferHandles.data();
 
   if (waitSemaphore) {
     submitInfo.waitSemaphoreCount = 1;
@@ -125,7 +128,7 @@ bool RenderContext::submit(const Queue *queue,
   VkFence fence{VK_NULL_HANDLE};
   if (!frame->requestFence(fence)) { return false; }
 
-  if (!queue->submit({submitInfo}, fence)) { return false; }
+  if (!graphicsQueue.submit({submitInfo}, fence)) { return false; }
 
   renderCompleteSemaphore = signalSemaphore;
 
