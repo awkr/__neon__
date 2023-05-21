@@ -9,7 +9,7 @@ struct CommandBuffer;
 struct Queue;
 
 struct RenderFrame {
-  RenderFrame(Device &device, RenderTarget &&renderTarget,
+  RenderFrame(Device &device, std::unique_ptr<RenderTarget> &&renderTarget,
               size_t threadCount = 1);
 
   ~RenderFrame();
@@ -27,14 +27,15 @@ struct RenderFrame {
   bool requestFence(VkFence &fence);
   void reset();
 
-  RenderTarget *getRenderTarget() { return &renderTarget; }
+  RenderTarget *getRenderTarget() { return renderTarget.get(); }
+  void updateRenderTarget(std::unique_ptr<RenderTarget> &&renderTarget);
 
 private:
   bool getCommandPool(const Queue *queue, CommandBufferResetMode resetMode,
                       std::vector<std::unique_ptr<CommandPool>> **commandPool);
 
   Device &device;
-  RenderTarget renderTarget{};
+  std::unique_ptr<RenderTarget> renderTarget;
   size_t threadCount{1};
   SemaphorePool semaphorePool;
   FencePool fencePool;

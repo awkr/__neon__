@@ -185,9 +185,7 @@ bool compileToSpirv(VkShaderStageFlagBits stage,
 
 void ShaderVariant::addDefinitions(
     const std::vector<std::pair<std::string, std::string>> &definitions) {
-  for (const auto &definition : definitions) {
-    addDefinition(definition);
-  }
+  for (const auto &definition : definitions) { addDefinition(definition); }
 }
 
 void ShaderVariant::addDefinition(

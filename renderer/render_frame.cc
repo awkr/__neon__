@@ -1,12 +1,13 @@
 #include "renderer/render_frame.h"
 #include "renderer/device.h"
 
-RenderFrame::RenderFrame(Device &device, RenderTarget &&renderTarget,
+RenderFrame::RenderFrame(Device &device,
+                         std::unique_ptr<RenderTarget> &&renderTarget,
                          size_t threadCount)
     : device{device}, semaphorePool{device}, fencePool{device},
       renderTarget{std::move(renderTarget)}, threadCount{threadCount} {}
 
-RenderFrame::~RenderFrame() { destroyRenderTarget(&renderTarget); }
+RenderFrame::~RenderFrame() { renderTarget.reset(); }
 
 bool RenderFrame::requestOutSemaphore(VkSemaphore &semaphore) {
   return semaphorePool.requestOutSemaphore(semaphore);
@@ -76,4 +77,9 @@ bool RenderFrame::getCommandPool(
   if (!it.second) { return false; }
   *commandPool = &(it.first->second);
   return true;
+}
+
+void RenderFrame::updateRenderTarget(
+    std::unique_ptr<RenderTarget> &&renderTarget) {
+  this->renderTarget = std::move(renderTarget);
 }

@@ -14,10 +14,8 @@ RenderContext::make(std::unique_ptr<Swapchain> &&swapchain) {
       return nullptr;
     }
 
-    RenderTarget renderTarget{};
-    if (!RENDER_TARGET_DEFAULT_CREATE_FUNC(image, &renderTarget)) {
-      return nullptr;
-    }
+    auto renderTarget = RenderTarget::DEFAULT_CREATE_FUNC(image);
+    if (!renderTarget) { return nullptr; }
 
     auto renderFrame = std::make_unique<RenderFrame>(*swapchain->device,
                                                      std::move(renderTarget));
@@ -64,6 +62,8 @@ bool RenderContext::submit(CommandBuffer *commandBuffer) {
 }
 
 bool RenderContext::beginFrame() {
+  if (!handleSurfaceChanges()) { return false; }
+
   auto frame = getActiveFrame();
   if (!frame->requestOutSemaphore(acquiredSemaphore)) { return false; }
 
@@ -131,6 +131,44 @@ bool RenderContext::submit(const Queue &graphicsQueue,
 
   *renderCompleteSemaphore = signalSemaphore;
 
+  return true;
+}
+
+bool RenderContext::handleSurfaceChanges() {
+  VkSurfaceCapabilitiesKHR properties{};
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice,
+                                            swapchain->surface, &properties);
+  const auto &currentExtent = properties.currentExtent;
+  if (currentExtent.width == 0xffffffff) { return false; }
+  const auto &existingExtent = swapchain->properties.extent;
+  if (currentExtent.width == existingExtent.width &&
+      currentExtent.height == existingExtent.height) {
+    return true;
+  }
+  if (!device->waitIdle()) { return false; }
+  resourceCache.clearFramebuffers();
+  swapchain = Swapchain::make(*swapchain, currentExtent);
+  auto it = frames.begin();
+  for (auto imageHandle : swapchain->images) {
+    Image image{};
+    if (!createImage(&image, device, imageHandle, currentExtent,
+                     swapchain->properties.surfaceFormat.format)) {
+      return false;
+    }
+
+    auto renderTarget = RenderTarget::DEFAULT_CREATE_FUNC(image);
+    if (!renderTarget) { return false; }
+
+    if (it != frames.end()) {
+      (*it)->updateRenderTarget(std::move(renderTarget));
+    } else {
+      auto renderFrame = std::make_unique<RenderFrame>(*swapchain->device,
+                                                       std::move(renderTarget));
+      frames.emplace_back(std::move(renderFrame));
+    }
+
+    ++it;
+  }
   return true;
 }
 

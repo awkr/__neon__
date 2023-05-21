@@ -4,9 +4,7 @@
 FencePool::~FencePool() {
   wait();
   reset();
-  for (auto fence : fences) {
-    vkDestroyFence(device.handle, fence, nullptr);
-  }
+  for (auto fence : fences) { vkDestroyFence(device.handle, fence, nullptr); }
   fences.clear();
 }
 

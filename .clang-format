@@ -5,6 +5,7 @@ AllowShortBlocksOnASingleLine: Always
 AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: All
+AllowShortLoopsOnASingleLine: true
 
 #AccessModifierOffset: -2
 #AlignAfterOpenBracket: Align
@@ -37,7 +38,6 @@ AllowShortFunctionsOnASingleLine: All
 #AllowShortCaseLabelsOnASingleLine: false
 #
 #AllowShortLambdasOnASingleLine: All
-#AllowShortLoopsOnASingleLine: false
 #AlwaysBreakAfterDefinitionReturnType: None
 #AlwaysBreakAfterReturnType: None
 #AlwaysBreakBeforeMultilineStrings: false

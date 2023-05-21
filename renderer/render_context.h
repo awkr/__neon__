@@ -30,6 +30,8 @@ private:
               VkSemaphore waitSemaphore, VkPipelineStageFlags waitPipelineStage,
               VkSemaphore *renderCompleteSemaphore);
 
+  bool handleSurfaceChanges();
+
   Device *device;
   std::unique_ptr<Swapchain> swapchain;
   std::vector<std::unique_ptr<RenderFrame>> frames;

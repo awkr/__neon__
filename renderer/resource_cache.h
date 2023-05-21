@@ -1,5 +1,6 @@
 #pragma once
 
+#include "renderer/framebuffer.h"
 #include "renderer/shader_module.h"
 #include <glm/gtx/hash.hpp>
 #include <mutex>
@@ -21,6 +22,7 @@ inline void hashParam(size_t &seed, const T &arg, const Args &...args) {
 
 struct ResourceCacheState {
   std::unordered_map<std::size_t, std::unique_ptr<ShaderModule>> shaderModules;
+  std::unordered_map<std::size_t, std::unique_ptr<Framebuffer>> framebuffers;
 };
 
 class ResourceCache {
@@ -28,6 +30,8 @@ public:
   ShaderModule *requestShaderModule(VkShaderStageFlagBits stage,
                                     const ShaderSource &source,
                                     const ShaderVariant &variant = {});
+
+  void clearFramebuffers();
 
 private:
   ResourceCacheState state{};

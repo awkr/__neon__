@@ -58,3 +58,5 @@ ShaderModule *ResourceCache::requestShaderModule(VkShaderStageFlagBits stage,
   return requestResource(mutex.shaderModule, state.shaderModules, stage, source,
                          entry, variant);
 }
+
+void ResourceCache::clearFramebuffers() { state.framebuffers.clear(); }

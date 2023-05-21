@@ -175,9 +175,7 @@ chooseImageUsage(const std::set<VkImageUsageFlagBits> &requestedImageUsages,
 VkImageUsageFlags
 compositeImageUsages(const std::set<VkImageUsageFlagBits> &imageUsages) {
   VkImageUsageFlags imageUsage{};
-  for (auto usage : imageUsages) {
-    imageUsage |= usage;
-  }
+  for (auto usage : imageUsages) { imageUsage |= usage; }
   return imageUsage;
 }
 
@@ -222,7 +220,7 @@ std::unique_ptr<Swapchain>
 Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
                 uint16_t imageCount,
                 const std::set<VkImageUsageFlagBits> &imageUsages,
-                VkPresentModeKHR presentMode) {
+                VkPresentModeKHR presentMode, VkSwapchainKHR oldSwapchain) {
   const std::vector<VkSurfaceFormatKHR> surfaceFormatPriority{
       {VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
       {VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
@@ -276,7 +274,7 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
                                       properties.surfaceFormat.format,
                                       &formatProperties);
 
-  properties.imageUsage = compositeImageUsages(
+  properties.imageUsages = std::move(
       chooseImageUsage(imageUsages, surfaceCapabilities.supportedUsageFlags,
                        formatProperties.optimalTilingFeatures));
 
@@ -300,10 +298,10 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
   createInfo.imageFormat = properties.surfaceFormat.format;
   createInfo.imageColorSpace = properties.surfaceFormat.colorSpace;
   createInfo.imageArrayLayers = properties.imageArrayLayers;
-  createInfo.imageUsage = properties.imageUsage;
+  createInfo.imageUsage = compositeImageUsages(properties.imageUsages);
   createInfo.preTransform = properties.preTransform;
   createInfo.compositeAlpha = properties.compositeAlpha;
-  createInfo.oldSwapchain = properties.oldSwapchain;
+  createInfo.oldSwapchain = oldSwapchain;
   createInfo.surface = surface;
 
   VkSwapchainKHR handle{VK_NULL_HANDLE};
@@ -312,8 +310,7 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
     return nullptr;
   }
 
-  auto swapchain = std::make_unique<Swapchain>();
-  swapchain->device = &device;
+  auto swapchain = std::make_unique<Swapchain>(&device, surface);
   swapchain->handle = handle;
   swapchain->properties = properties;
 
@@ -327,6 +324,17 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
 
   return std::move(swapchain);
 }
+
+std::unique_ptr<Swapchain> Swapchain::make(Swapchain &oldSwapchain,
+                                           const VkExtent2D &extent) {
+  return Swapchain::make(*oldSwapchain.device, oldSwapchain.surface, extent,
+                         oldSwapchain.properties.imageCount,
+                         oldSwapchain.properties.imageUsages,
+                         oldSwapchain.properties.presentMode);
+}
+
+Swapchain::Swapchain(Device *device, VkSurfaceKHR surface)
+    : device{device}, surface{surface} {}
 
 Swapchain::~Swapchain() {
   images.clear();
