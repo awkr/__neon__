@@ -27,9 +27,6 @@ chooseImageUsage(const std::set<VkImageUsageFlagBits> &requestedImageUsages,
                  VkImageUsageFlags supportedImageUsage,
                  VkFormatFeatureFlags supportedFeatures);
 
-VkImageUsageFlags
-compositeImageUsages(const std::set<VkImageUsageFlagBits> &imageUsages);
-
 VkSurfaceTransformFlagBitsKHR
 chooseTransform(VkSurfaceTransformFlagBitsKHR requestTransform,
                 VkSurfaceTransformFlagsKHR supportedTransform,

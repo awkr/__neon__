@@ -10,7 +10,8 @@ RenderContext::make(std::unique_ptr<Swapchain> &&swapchain) {
     Image image{};
     if (!createImage(&image, swapchain->device, swapchain->images[i],
                      swapchain->properties.extent,
-                     swapchain->properties.surfaceFormat.format)) {
+                     swapchain->properties.surfaceFormat.format,
+                     compositeImageUsages(swapchain->properties.imageUsages))) {
       return nullptr;
     }
 
@@ -154,7 +155,8 @@ bool RenderContext::handleSurfaceChanges() {
   for (auto imageHandle : swapchain->images) {
     Image image{};
     if (!createImage(&image, device, imageHandle, currentExtent,
-                     swapchain->properties.surfaceFormat.format)) {
+                     swapchain->properties.surfaceFormat.format,
+                     compositeImageUsages(swapchain->properties.imageUsages))) {
       return false;
     }
 

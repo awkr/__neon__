@@ -10,6 +10,7 @@ public:
                   ShaderSource &&fragmentShader);
 
   void prepare() override;
+  void draw() override;
 
 protected:
   std::vector<Mesh *> meshes;

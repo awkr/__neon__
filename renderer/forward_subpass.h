@@ -8,4 +8,5 @@ public:
                  ShaderSource &&fragmentShader);
 
   void prepare() override;
+  void draw() override;
 };

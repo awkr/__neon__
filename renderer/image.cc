@@ -3,11 +3,12 @@
 
 bool createImage(Image *image, Device *device, VkImage handle,
                  const VkExtent2D &extent, VkFormat format,
-                 VkSampleCountFlagBits sampleCount) {
+                 VkImageUsageFlags usage, VkSampleCountFlagBits sampleCount) {
   image->device = device;
   image->handle = handle;
   image->extent = extent;
   image->format = format;
+  image->usage = usage;
   image->sampleCount = sampleCount;
   return true;
 }
@@ -40,7 +41,7 @@ bool createImage(Image *image, Device *device, const VkExtent2D &extent,
     return false;
   }
 
-  createImage(image, device, handle, extent, format, sampleCount);
+  createImage(image, device, handle, extent, format, usage, sampleCount);
 
   VkMemoryRequirements memoryRequirements{};
   vkGetImageMemoryRequirements(device->handle, image->handle,

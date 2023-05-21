@@ -51,3 +51,6 @@ struct Swapchain {
   VkSwapchainKHR handle{VK_NULL_HANDLE};
   std::vector<VkImage> images;
 };
+
+VkImageUsageFlags
+compositeImageUsages(const std::set<VkImageUsageFlagBits> &imageUsages);

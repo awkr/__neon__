@@ -13,3 +13,9 @@ struct ImageMemoryBarrier {
   uint32_t oldQueueFamily{VK_QUEUE_FAMILY_IGNORED};
   uint32_t newQueueFamily{VK_QUEUE_FAMILY_IGNORED};
 };
+
+// load and store operation for a render pass attachment
+struct LoadStoreOp {
+  VkAttachmentLoadOp loadOp{VK_ATTACHMENT_LOAD_OP_CLEAR};
+  VkAttachmentStoreOp storeOp{VK_ATTACHMENT_STORE_OP_STORE};
+};

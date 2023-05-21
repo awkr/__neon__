@@ -16,6 +16,7 @@ VkSurfaceKHR surface{VK_NULL_HANDLE};
 std::unique_ptr<Device> device;
 
 std::unique_ptr<RenderContext> renderContext;
+std::unique_ptr<RenderPipeline> renderPipeline;
 
 void setViewport(CommandBuffer &commandBuffer, const VkExtent2D &extent) {
   VkViewport viewport{};
@@ -31,15 +32,16 @@ void setScissor(CommandBuffer &commandBuffer, const VkExtent2D &extent) {
   commandBuffer.setScissor(scissor);
 }
 
-void draw(CommandBuffer &commandBuffer, RenderTarget *renderTarget) {
-  setViewport(commandBuffer, renderTarget->extent);
-  setScissor(commandBuffer, renderTarget->extent);
+bool draw(CommandBuffer &commandBuffer, RenderTarget &renderTarget) {
+  setViewport(commandBuffer, renderTarget.extent);
+  setScissor(commandBuffer, renderTarget.extent);
 
-  // TODO
+  if (!renderPipeline->draw(commandBuffer, renderTarget)) { return false; }
+  return true;
 }
 
-void render(CommandBuffer &commandBuffer, RenderTarget *renderTarget) {
-  auto &imageViews = renderTarget->imageViews;
+void render(CommandBuffer &commandBuffer, RenderTarget &renderTarget) {
+  auto &imageViews = renderTarget.imageViews;
   { // image 0 is the swapchain
     ImageMemoryBarrier memoryBarrier{};
     memoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
@@ -69,7 +71,7 @@ void render(CommandBuffer &commandBuffer, RenderTarget *renderTarget) {
     commandBuffer.imageMemoryBarrier(imageViews[1], memoryBarrier);
   }
 
-  draw(commandBuffer, renderTarget);
+  if (!draw(commandBuffer, renderTarget)) {}
 
   {
     ImageMemoryBarrier memoryBarrier{};
@@ -89,7 +91,7 @@ bool update() {
   if (!commandBuffer->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT)) {
     return false;
   }
-  render(*commandBuffer, renderContext->getActiveFrame()->getRenderTarget());
+  render(*commandBuffer, *renderContext->getActiveFrame()->getRenderTarget());
   if (!commandBuffer->end()) { return false; }
   if (!renderContext->submit(commandBuffer)) { return false; }
   return true;
@@ -146,7 +148,7 @@ int main() {
   auto sceneSubpass = std::make_unique<ForwardSubpass>(
       renderContext.get(), std::move(vertShader), std::move(fragShader));
 
-  auto renderPipeline = std::make_unique<RenderPipeline>();
+  renderPipeline = std::make_unique<RenderPipeline>();
   renderPipeline->addSubpass(std::move(sceneSubpass));
 
   while (!glfwWindowShouldClose(window)) {

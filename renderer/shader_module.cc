@@ -1,6 +1,7 @@
 #include "renderer/shader_module.h"
 #include "core/file_system.h"
 #include "core/string_utils.h"
+#include "renderer/device.h"
 #include <SPIRV/GlslangToSpv.h>
 #include <glslang/Public/ResourceLimits.h>
 #include <iostream>
@@ -123,11 +124,11 @@ bool compileToSpirv(VkShaderStageFlagBits stage,
   auto lang = findShaderLanguage(stage);
   auto source = std::string(glsl.begin(), glsl.end());
 
-  const char *fileNames[1] = {""};
+  const char *filenames[1] = {""};
   const char *shaderSource = reinterpret_cast<const char *>(source.data());
 
   glslang::TShader shader(lang);
-  shader.setStringsWithLengthsAndNames(&shaderSource, nullptr, fileNames, 1);
+  shader.setStringsWithLengthsAndNames(&shaderSource, nullptr, filenames, 1);
   shader.setEntryPoint(entry.c_str());
   shader.setSourceEntryPoint(entry.c_str());
   shader.setPreamble(variant.getPreamble().c_str());
@@ -204,7 +205,8 @@ void ShaderVariant::updateId() {
   id = hasher(preamble);
 }
 
-std::unique_ptr<ShaderModule> ShaderModule::make(VkShaderStageFlagBits stage,
+std::unique_ptr<ShaderModule> ShaderModule::make(Device &device,
+                                                 VkShaderStageFlagBits stage,
                                                  const ShaderSource &source,
                                                  const std::string &entry,
                                                  const ShaderVariant &variant) {

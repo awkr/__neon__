@@ -39,7 +39,8 @@ add_executable(neon
     renderer/command_pool.cc
     renderer/command_buffer.cc
     renderer/fence_pool.cc
-    renderer/framebuffer.cc)
+    renderer/framebuffer.cc
+    renderer/render_pass.cc)
 
 target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan glm glslang glslang-default-resource-limits SPIRV)
 

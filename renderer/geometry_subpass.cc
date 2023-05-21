@@ -7,3 +7,5 @@ GeometrySubpass::GeometrySubpass(RenderContext *renderContext,
               std::move(fragmentShader)) {}
 
 void GeometrySubpass::prepare() {}
+
+void GeometrySubpass::draw() {}

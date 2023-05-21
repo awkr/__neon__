@@ -22,6 +22,12 @@ const RenderTarget::CreateFunc RenderTarget::DEFAULT_CREATE_FUNC =
     if (!createImageView(&imageView, &image)) { return nullptr; }
 
     renderTarget->imageViews.emplace_back(imageView);
+
+    renderTarget->attachments.emplace_back(Attachment{
+        .format = image.format,
+        .usage = image.usage,
+        .sampleCount = image.sampleCount,
+    });
   }
 
   return std::move(renderTarget);
@@ -34,3 +40,12 @@ RenderTarget::~RenderTarget() {
   for (auto &image : images) { destroyImage(&image); }
   images.clear();
 }
+
+// void RenderTarget::setInputAttachments(const std::vector<uint32_t> &inputs) {
+//   inputAttachments = inputs;
+// }
+//
+// void RenderTarget::setOutputAttachments(const std::vector<uint32_t> &outputs)
+// {
+//   outputAttachments = outputs;
+// }

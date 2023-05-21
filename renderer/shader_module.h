@@ -4,6 +4,8 @@
 #include <string>
 #include <vulkan/vulkan.h>
 
+struct Device;
+
 struct ShaderSource {
   uint64_t id;
   std::string filepath;
@@ -37,10 +39,9 @@ struct ShaderModule : public Resource {
 public:
   uint64_t getId() const { return id; }
 
-  static std::unique_ptr<ShaderModule> make(VkShaderStageFlagBits stage,
-                                            const ShaderSource &source,
-                                            const std::string &entry,
-                                            const ShaderVariant &variant);
+  static std::unique_ptr<ShaderModule>
+  make(Device &device, VkShaderStageFlagBits stage, const ShaderSource &source,
+       const std::string &entry, const ShaderVariant &variant);
 
 private:
   uint64_t id{0};

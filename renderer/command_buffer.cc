@@ -1,7 +1,9 @@
 #include "renderer/command_buffer.h"
 #include "renderer/command_pool.h"
 #include "renderer/device.h"
-#include "renderer/image_view.h"
+#include "renderer/render_pass.h"
+#include "renderer/render_target.h"
+#include "renderer/subpass.h"
 
 std::unique_ptr<CommandBuffer> CommandBuffer::make(CommandPool *commandPool,
                                                    VkCommandBufferLevel level) {
@@ -17,7 +19,7 @@ std::unique_ptr<CommandBuffer> CommandBuffer::make(CommandPool *commandPool,
     return nullptr;
   }
 
-  auto commandBuffer = std::make_unique<CommandBuffer>();
+  auto commandBuffer = std::make_unique<CommandBuffer>(commandPool->device);
   commandBuffer->level = level;
   commandBuffer->handle = handle;
   return std::move(commandBuffer);
@@ -78,3 +80,27 @@ void CommandBuffer::setScissor(const VkRect2D &scissor) const {
   std::vector<VkRect2D> scissors{scissor};
   vkCmdSetScissor(handle, 0, scissors.size(), scissors.data());
 }
+
+bool CommandBuffer::beginRenderPass(
+    const RenderTarget &renderTarget,
+    const std::vector<LoadStoreOp> &loadStoreOps,
+    const std::vector<VkClearValue> &clearValues,
+    const std::vector<std::unique_ptr<Subpass>> &subpasses) {
+  std::vector<SubpassInfo> subpassInfos(subpasses.size());
+  auto it = subpassInfos.begin();
+  for (const auto &subpass : subpasses) {
+    it->inputAttachments = subpass->getInputAttachments();
+    it->outputAttachments = subpass->getOutputAttachments();
+    it->enableDepthStencilAttachment = subpass->enableDepthStencilAttachment;
+
+    ++it;
+  }
+  auto renderPass = device.getResourceCache().requestRenderPass(
+      device, renderTarget.attachments, loadStoreOps, subpassInfos);
+  if (!renderPass) { return false; }
+  return true;
+}
+
+void CommandBuffer::endRenderPass() {}
+
+void CommandBuffer::nextSubpass() {}

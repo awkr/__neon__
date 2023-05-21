@@ -7,8 +7,10 @@ public:
   ~RenderPipeline();
 
   void addSubpass(std::unique_ptr<Subpass> &&subpass);
+  bool draw(CommandBuffer &commandBuffer, RenderTarget &renderTarget);
 
 private:
+  std::vector<LoadStoreOp> loadStoreOps = std::vector<LoadStoreOp>(2);
   std::vector<VkClearValue> clearValue{
       {.color = {0, 0, 0, 1}},
       {.depthStencil = {0, ~0U}},
