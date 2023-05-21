@@ -28,6 +28,11 @@ struct Swapchain {
                VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
                VK_IMAGE_USAGE_TRANSFER_SRC_BIT,
            },
+       const VkSurfaceFormatKHR &surfaceFormat =
+           {
+               VK_FORMAT_R8G8B8A8_SRGB,
+               VK_COLOR_SPACE_SRGB_NONLINEAR_KHR,
+           },
        VkPresentModeKHR presentMode = VK_PRESENT_MODE_FIFO_KHR,
        VkSwapchainKHR oldSwapchain = VK_NULL_HANDLE);
 

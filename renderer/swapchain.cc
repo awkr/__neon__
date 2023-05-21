@@ -114,9 +114,6 @@ VkSurfaceFormatKHR chooseSurfaceFormat(
     it = availableSurfaceFormats.begin();
     std::cout << "[Swapchain] Surface format " << requestedSurfaceFormat
               << " not supported. default to " << *it << std::endl;
-  } else {
-    std::cout << "[Swapchain] Surface format selected: "
-              << requestedSurfaceFormat << std::endl;
   }
 
   return *it;
@@ -220,6 +217,7 @@ std::unique_ptr<Swapchain>
 Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
                 uint16_t imageCount,
                 const std::set<VkImageUsageFlagBits> &imageUsages,
+                const VkSurfaceFormatKHR &surfaceFormat,
                 VkPresentModeKHR presentMode, VkSwapchainKHR oldSwapchain) {
   const std::vector<VkSurfaceFormatKHR> surfaceFormatPriority{
       {VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
@@ -266,8 +264,8 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
   properties.imageArrayLayers =
       chooseImageArrayLayers(1u, surfaceCapabilities.maxImageArrayLayers);
 
-  properties.surfaceFormat = chooseSurfaceFormat(
-      properties.surfaceFormat, surfaceFormats, surfaceFormatPriority);
+  properties.surfaceFormat =
+      chooseSurfaceFormat(surfaceFormat, surfaceFormats, surfaceFormatPriority);
 
   VkFormatProperties formatProperties{};
   vkGetPhysicalDeviceFormatProperties(device.physicalDevice,
@@ -330,6 +328,7 @@ std::unique_ptr<Swapchain> Swapchain::make(Swapchain &oldSwapchain,
   return Swapchain::make(*oldSwapchain.device, oldSwapchain.surface, extent,
                          oldSwapchain.properties.imageCount,
                          oldSwapchain.properties.imageUsages,
+                         oldSwapchain.properties.surfaceFormat,
                          oldSwapchain.properties.presentMode);
 }
 
