@@ -1,6 +1,7 @@
 #include "renderer/command_buffer.h"
 #include "renderer/command_pool.h"
 #include "renderer/device.h"
+#include "renderer/image_view.h"
 
 std::unique_ptr<CommandBuffer> CommandBuffer::make(CommandPool *commandPool,
                                                    VkCommandBufferLevel level) {
@@ -46,4 +47,24 @@ bool CommandBuffer::end() {
   if (vkEndCommandBuffer(handle) != VK_SUCCESS) { return false; }
   state = CommandBufferState::Executable;
   return true;
+}
+
+void CommandBuffer::imageMemoryBarrier(
+    const ImageView &imageView, const ImageMemoryBarrier &memoryBarrier) const {
+  VkImageMemoryBarrier imageMemoryBarrier{
+      VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER};
+  imageMemoryBarrier.oldLayout = memoryBarrier.oldLayout;
+  imageMemoryBarrier.newLayout = memoryBarrier.newLayout;
+  imageMemoryBarrier.image = imageView.image->handle;
+  imageMemoryBarrier.subresourceRange = imageView.subresourceRange;
+  imageMemoryBarrier.srcAccessMask = memoryBarrier.srcAccess;
+  imageMemoryBarrier.dstAccessMask = memoryBarrier.dstAccess;
+  imageMemoryBarrier.srcQueueFamilyIndex = memoryBarrier.oldQueueFamily;
+  imageMemoryBarrier.dstQueueFamilyIndex = memoryBarrier.newQueueFamily;
+
+  VkPipelineStageFlags srcStage = memoryBarrier.srcStage;
+  VkPipelineStageFlags dstStage = memoryBarrier.dstStage;
+
+  vkCmdPipelineBarrier(handle, srcStage, dstStage, 0, 0, nullptr, 0, nullptr, 1,
+                       &imageMemoryBarrier);
 }

@@ -43,3 +43,5 @@ add_executable(neon
 target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan glm glslang glslang-default-resource-limits SPIRV)
 
 target_include_directories(neon PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+
+target_compile_definitions(neon PRIVATE GLM_ENABLE_EXPERIMENTAL)

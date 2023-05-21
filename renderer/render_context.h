@@ -17,6 +17,8 @@ public:
 
   ResourceCache &getResourceCache() { return resourceCache; }
 
+  RenderFrame *getActiveFrame();
+
 private:
   bool beginFrame();
   bool endFrame(VkSemaphore waitSemaphore);
@@ -27,8 +29,6 @@ private:
               const std::vector<CommandBuffer *> &commandBuffers,
               VkSemaphore waitSemaphore, VkPipelineStageFlags waitPipelineStage,
               VkSemaphore *renderCompleteSemaphore);
-
-  RenderFrame *getActiveFrame();
 
   Device *device;
   std::unique_ptr<Swapchain> swapchain;

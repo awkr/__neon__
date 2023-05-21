@@ -27,6 +27,8 @@ struct RenderFrame {
   bool requestFence(VkFence &fence);
   void reset();
 
+  RenderTarget *getRenderTarget() { return &renderTarget; }
+
 private:
   bool getCommandPool(const Queue *queue, CommandBufferResetMode resetMode,
                       std::vector<std::unique_ptr<CommandPool>> **commandPool);

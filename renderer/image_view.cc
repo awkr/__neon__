@@ -8,8 +8,11 @@ bool createImageView(ImageView *imageView, Image *image) {
   imageViewCreateInfo.image = image->handle;
   imageViewCreateInfo.format = image->format;
 
-  if (isDepthStencilFormat(image->format)) {
+  if (isDepthOnlyFormat(image->format)) {
     imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+  } else if (isDepthStencilFormat(image->format)) {
+    imageViewCreateInfo.subresourceRange.aspectMask =
+        VK_IMAGE_ASPECT_DEPTH_BIT | VK_IMAGE_ASPECT_STENCIL_BIT;
   } else {
     imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
   }
@@ -25,7 +28,7 @@ bool createImageView(ImageView *imageView, Image *image) {
   }
 
   imageView->image = image;
-
+  imageView->subresourceRange = imageViewCreateInfo.subresourceRange;
   return true;
 }
 

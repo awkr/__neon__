@@ -17,12 +17,62 @@ Device device{};
 
 std::unique_ptr<RenderContext> renderContext;
 
+void draw(CommandBuffer &commandBuffer, RenderTarget *renderTarget) {
+  // TODO
+}
+
+void render(CommandBuffer &commandBuffer, RenderTarget *renderTarget) {
+  auto &imageViews = renderTarget->imageViews;
+  { // image 0 is the swapchain
+    ImageMemoryBarrier memoryBarrier{};
+    memoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    memoryBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    memoryBarrier.srcAccess = 0;
+    memoryBarrier.dstAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    memoryBarrier.srcStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    memoryBarrier.dstStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+    commandBuffer.imageMemoryBarrier(imageViews[0], memoryBarrier);
+
+    for (size_t i = 2; i < imageViews.size(); ++i) {
+      commandBuffer.imageMemoryBarrier(imageViews[i], memoryBarrier);
+    }
+  }
+  {
+    ImageMemoryBarrier memoryBarrier{};
+    memoryBarrier.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    memoryBarrier.newLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+    memoryBarrier.srcAccess = 0;
+    memoryBarrier.dstAccess = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_READ_BIT |
+                              VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+    memoryBarrier.srcStage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+    memoryBarrier.dstStage = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT |
+                             VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+
+    commandBuffer.imageMemoryBarrier(imageViews[1], memoryBarrier);
+  }
+
+  draw(commandBuffer, renderTarget);
+
+  {
+    ImageMemoryBarrier memoryBarrier{};
+    memoryBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+    memoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+    memoryBarrier.srcAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    memoryBarrier.srcStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    memoryBarrier.dstStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+
+    commandBuffer.imageMemoryBarrier(imageViews[0], memoryBarrier);
+  }
+}
+
 bool update() {
   CommandBuffer *commandBuffer{nullptr};
   if (!renderContext->begin(&commandBuffer)) { return false; }
   if (!commandBuffer->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT)) {
     return false;
   }
+  render(*commandBuffer, renderContext->getActiveFrame()->getRenderTarget());
   if (!commandBuffer->end()) { return false; }
   if (!renderContext->submit(commandBuffer)) { return false; }
   return true;

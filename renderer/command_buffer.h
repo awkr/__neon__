@@ -1,9 +1,10 @@
 #pragma once
 
+#include "renderer/types.h"
 #include <memory>
-#include <vulkan/vulkan.h>
 
 struct CommandPool;
+struct ImageView;
 
 enum class CommandBufferResetMode {
   ResetPool,
@@ -25,6 +26,9 @@ struct CommandBuffer {
 
   bool begin(VkCommandBufferUsageFlags usage);
   bool end();
+
+  void imageMemoryBarrier(const ImageView &imageView,
+                          const ImageMemoryBarrier &memoryBarrier) const;
 
   VkCommandBufferLevel level{};
   VkCommandBuffer handle{VK_NULL_HANDLE};
