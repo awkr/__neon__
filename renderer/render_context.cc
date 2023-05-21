@@ -46,8 +46,8 @@ bool RenderContext::begin(CommandBuffer **commandBuffer) {
   if (!device->getQueue(VK_QUEUE_GRAPHICS_BIT, 0, &graphicsQueue)) {
     return false;
   }
-  bool ok = getActiveFrame()->requestCommandBuffer(
-      commandBuffer, graphicsQueue, CommandBufferResetMode::ResetPool);
+  bool ok =
+      getActiveFrame()->requestCommandBuffer(commandBuffer, graphicsQueue);
   if (!ok) { return false; }
   return true;
 }
@@ -112,8 +112,8 @@ bool RenderContext::submit(const Queue &graphicsQueue,
   if (!frame->requestSemaphore(signalSemaphore)) { return false; }
 
   VkSubmitInfo submitInfo{VK_STRUCTURE_TYPE_SUBMIT_INFO};
-  // submitInfo.commandBufferCount = commandBufferHandles.size();
-  // submitInfo.pCommandBuffers = commandBufferHandles.data();
+  submitInfo.commandBufferCount = commandBufferHandles.size();
+  submitInfo.pCommandBuffers = commandBufferHandles.data();
 
   if (waitSemaphore) {
     submitInfo.waitSemaphoreCount = 1;

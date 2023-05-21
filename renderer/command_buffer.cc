@@ -17,10 +17,33 @@ std::unique_ptr<CommandBuffer> CommandBuffer::make(CommandPool *commandPool,
   }
 
   auto commandBuffer = std::make_unique<CommandBuffer>();
+  commandBuffer->level = level;
   commandBuffer->handle = handle;
   return std::move(commandBuffer);
 }
 
 void CommandBuffer::reset(CommandBufferResetMode resetMode) {
   // TODO
+}
+
+bool CommandBuffer::begin(VkCommandBufferUsageFlags usage) {
+  if (state == CommandBufferState::Recording) { return false; }
+  state = CommandBufferState::Recording;
+
+  // TODO reset each domain state
+
+  VkCommandBufferBeginInfo beginInfo{
+      VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO};
+  beginInfo.flags = usage;
+  // VkCommandBufferInheritanceInfo inheritanceInfo{
+  //     VK_STRUCTURE_TYPE_COMMAND_BUFFER_INHERITANCE_INFO};
+  // if (level == VK_COMMAND_BUFFER_LEVEL_SECONDARY) {}
+  return vkBeginCommandBuffer(handle, &beginInfo) == VK_SUCCESS;
+}
+
+bool CommandBuffer::end() {
+  if (state != CommandBufferState::Recording) { return false; }
+  if (vkEndCommandBuffer(handle) != VK_SUCCESS) { return false; }
+  state = CommandBufferState::Executable;
+  return true;
 }

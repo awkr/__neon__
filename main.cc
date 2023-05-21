@@ -17,11 +17,15 @@ Device device{};
 
 std::unique_ptr<RenderContext> renderContext;
 
-void update() {
-  if (CommandBuffer * commandBuffer{nullptr};
-      renderContext->begin(&commandBuffer)) {
-    renderContext->submit(commandBuffer);
+bool update() {
+  CommandBuffer *commandBuffer{nullptr};
+  if (!renderContext->begin(&commandBuffer)) { return false; }
+  if (!commandBuffer->begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT)) {
+    return false;
   }
+  if (!commandBuffer->end()) { return false; }
+  if (!renderContext->submit(commandBuffer)) { return false; }
+  return true;
 }
 
 int main() {
@@ -79,7 +83,7 @@ int main() {
   renderPipeline->addSubpass(std::move(sceneSubpass));
 
   while (!glfwWindowShouldClose(window)) {
-    update();
+    if (!update()) { printf("update error\n"); }
     glfwPollEvents();
   }
 
