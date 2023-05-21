@@ -17,7 +17,24 @@ Device device{};
 
 std::unique_ptr<RenderContext> renderContext;
 
+void setViewport(CommandBuffer &commandBuffer, const VkExtent2D &extent) {
+  VkViewport viewport{};
+  viewport.width = static_cast<float>(extent.width);
+  viewport.height = static_cast<float>(extent.height);
+  viewport.minDepth = 0.0f;
+  viewport.maxDepth = 1.0f;
+  commandBuffer.setViewport(viewport);
+}
+
+void setScissor(CommandBuffer &commandBuffer, const VkExtent2D &extent) {
+  VkRect2D scissor{.extent = extent};
+  commandBuffer.setScissor(scissor);
+}
+
 void draw(CommandBuffer &commandBuffer, RenderTarget *renderTarget) {
+  setViewport(commandBuffer, renderTarget->extent);
+  setScissor(commandBuffer, renderTarget->extent);
+
   // TODO
 }
 

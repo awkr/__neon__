@@ -13,6 +13,7 @@ const RenderTarget::CreateFunc RenderTarget::DEFAULT_CREATE_FUNC =
   }
 
   auto renderTarget = std::make_unique<RenderTarget>();
+  renderTarget->extent = color.extent;
   renderTarget->images.emplace_back(color);
   renderTarget->images.emplace_back(depth);
 

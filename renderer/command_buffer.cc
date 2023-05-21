@@ -68,3 +68,13 @@ void CommandBuffer::imageMemoryBarrier(
   vkCmdPipelineBarrier(handle, srcStage, dstStage, 0, 0, nullptr, 0, nullptr, 1,
                        &imageMemoryBarrier);
 }
+
+void CommandBuffer::setViewport(const VkViewport &viewport) const {
+  std::vector<VkViewport> viewports{viewport};
+  vkCmdSetViewport(handle, 0, viewports.size(), viewports.data());
+}
+
+void CommandBuffer::setScissor(const VkRect2D &scissor) const {
+  std::vector<VkRect2D> scissors{scissor};
+  vkCmdSetScissor(handle, 0, scissors.size(), scissors.data());
+}

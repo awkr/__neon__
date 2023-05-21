@@ -29,6 +29,8 @@ struct CommandBuffer {
 
   void imageMemoryBarrier(const ImageView &imageView,
                           const ImageMemoryBarrier &memoryBarrier) const;
+  void setViewport(const VkViewport &viewport) const;
+  void setScissor(const VkRect2D &scissor) const;
 
   VkCommandBufferLevel level{};
   VkCommandBuffer handle{VK_NULL_HANDLE};

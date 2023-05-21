@@ -10,6 +10,7 @@ struct RenderTarget {
 
   ~RenderTarget();
 
+  VkExtent2D extent{};
   std::vector<Image> images;
   std::vector<ImageView> imageViews;
 };
