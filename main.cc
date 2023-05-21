@@ -1,10 +1,10 @@
+#include "core/logging.h"
 #include "renderer/device.h"
 #include "renderer/forward_subpass.h"
 #include "renderer/instance.h"
 #include "renderer/render_context.h"
 #include "renderer/render_pipeline.h"
 #include <GLFW/glfw3.h>
-#include <cstdio>
 
 const char *windowTitle = "neon";
 uint32_t windowWidth{800};
@@ -96,8 +96,8 @@ bool update() {
 }
 
 int main() {
-  printf("Hello, stranger.\n");
-
+  std::cout << LOG_COLOR_MAGENTA << "Hello, stranger." << LOG_COLOR_RESET
+            << std::endl;
   if (!glfwInit() || !glfwVulkanSupported()) { return 1; }
 
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
@@ -168,6 +168,6 @@ int main() {
   glfwDestroyWindow(window);
   glfwTerminate();
 
-  printf("Bye.\n");
+  std::cout << LOG_COLOR_MAGENTA << "Bye." << LOG_COLOR_RESET << std::endl;
   return 0;
 }

@@ -2,7 +2,6 @@
 #include "core/logging.h"
 #include "renderer/device.h"
 #include "renderer/ostream.h"
-#include <iostream>
 
 VkExtent2D chooseExtent(const VkExtent2D &requestExtent,
                         const VkExtent2D &minExtent,
