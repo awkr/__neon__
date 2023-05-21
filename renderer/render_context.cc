@@ -56,10 +56,10 @@ bool RenderContext::submit(CommandBuffer *commandBuffer) {
   VkSemaphore renderCompleteSemaphore{VK_NULL_HANDLE};
   if (!submit(*queue, {commandBuffer}, acquiredSemaphore,
               VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
-              renderCompleteSemaphore)) {
+              &renderCompleteSemaphore)) {
     return false;
   }
-  endFrame(renderCompleteSemaphore);
+  if (!endFrame(renderCompleteSemaphore)) { return false; }
   return true;
 }
 
@@ -71,8 +71,6 @@ bool RenderContext::beginFrame() {
   if (result != VK_SUCCESS) { return false; }
 
   waitFrame();
-
-  printf("++> acquired image index %d\n", activeFrameIndex);
 
   return true;
 }
@@ -88,6 +86,7 @@ bool RenderContext::endFrame(VkSemaphore waitSemaphore) {
 
   if (!queue->present(presentInfo)) { return false; }
 
+  // frame is not active anymore, release owned semaphore
   getActiveFrame()->releaseSemaphore(acquiredSemaphore);
   acquiredSemaphore = VK_NULL_HANDLE;
   return true;
@@ -99,7 +98,7 @@ bool RenderContext::submit(const Queue &graphicsQueue,
                            const std::vector<CommandBuffer *> &commandBuffers,
                            VkSemaphore waitSemaphore,
                            VkPipelineStageFlags waitPipelineStage,
-                           VkSemaphore &renderCompleteSemaphore) {
+                           VkSemaphore *renderCompleteSemaphore) {
   std::vector<VkCommandBuffer> commandBufferHandles(commandBuffers.size(),
                                                     VK_NULL_HANDLE);
   std::transform(
@@ -130,7 +129,7 @@ bool RenderContext::submit(const Queue &graphicsQueue,
 
   if (!graphicsQueue.submit({submitInfo}, fence)) { return false; }
 
-  renderCompleteSemaphore = signalSemaphore;
+  *renderCompleteSemaphore = signalSemaphore;
 
   return true;
 }

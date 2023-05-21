@@ -26,7 +26,7 @@ private:
   bool submit(const Queue &graphicsQueue,
               const std::vector<CommandBuffer *> &commandBuffers,
               VkSemaphore waitSemaphore, VkPipelineStageFlags waitPipelineStage,
-              VkSemaphore &renderCompleteSemaphore);
+              VkSemaphore *renderCompleteSemaphore);
 
   RenderFrame *getActiveFrame();
 
