@@ -1,4 +1,5 @@
 #include "renderer/swapchain.h"
+#include "core/logging.h"
 #include "renderer/device.h"
 #include "renderer/ostream.h"
 #include <iostream>
@@ -105,8 +106,9 @@ VkSurfaceFormatKHR chooseSurfaceFormat(
             return false;
           });
       if (it != availableSurfaceFormats.end()) {
-        std::cout << "[Swapchain] Surface format " << requestedSurfaceFormat
-                  << " not supported. select " << *it << std::endl;
+        std::cout << LOG_COLOR_YELLOW << "[Swapchain] Surface format "
+                  << requestedSurfaceFormat << " not supported. select " << *it
+                  << LOG_COLOR_RESET << std::endl;
         return *it;
       }
     }

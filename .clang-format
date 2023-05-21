@@ -6,6 +6,7 @@ AllowShortIfStatementsOnASingleLine: AllIfsAndElse
 AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
+AlignConsecutiveMacros: Consecutive
 
 #AccessModifierOffset: -2
 #AlignAfterOpenBracket: Align
@@ -28,7 +29,6 @@ AllowShortLoopsOnASingleLine: true
 #  AcrossComments: false
 #  AlignCompound: false
 #  PadOperators: false
-#AlignConsecutiveMacros: AcrossComments
 #AlignEscapedNewlines: Right
 #AlignOperands: Align
 #AlignTrailingComments: true
