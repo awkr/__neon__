@@ -32,6 +32,7 @@ public:
                                     const ShaderVariant &variant = {});
 
   void clearFramebuffers();
+  void clear();
 
 private:
   ResourceCacheState state{};

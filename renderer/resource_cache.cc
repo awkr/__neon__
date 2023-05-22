@@ -60,3 +60,8 @@ ShaderModule *ResourceCache::requestShaderModule(VkShaderStageFlagBits stage,
 }
 
 void ResourceCache::clearFramebuffers() { state.framebuffers.clear(); }
+
+void ResourceCache::clear() {
+  clearFramebuffers();
+  state.shaderModules.clear();
+}

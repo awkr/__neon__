@@ -34,6 +34,7 @@ RenderContext::make(std::unique_ptr<Swapchain> &&swapchain) {
 }
 
 RenderContext::~RenderContext() {
+  resourceCache.clear();
   frames.clear();
   swapchain.reset();
 }
