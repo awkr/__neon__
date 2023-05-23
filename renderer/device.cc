@@ -14,18 +14,21 @@ bool isDepthStencilFormat(VkFormat format) {
          format == VK_FORMAT_D32_SFLOAT_S8_UINT || isDepthOnlyFormat(format);
 }
 
-bool createDevice(VkInstance instance, Device *device, VkSurfaceKHR surface) {
+std::unique_ptr<Device> Device::make(VkInstance instance,
+                                     VkSurfaceKHR surface) {
   // pick a physical device
   uint32_t physicalDeviceCount{0};
   vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr);
-  if (physicalDeviceCount < 1) { return false; }
+  if (physicalDeviceCount < 1) { return nullptr; }
 
   std::vector<VkPhysicalDevice> physicalDevices(physicalDeviceCount);
   vkEnumeratePhysicalDevices(instance, &physicalDeviceCount,
                              physicalDevices.data());
 
-  device->physicalDevice =
-      physicalDevices.front(); // just simply pick the first one
+  auto device = std::make_unique<Device>();
+
+  // just simply pick the first one
+  device->physicalDevice = physicalDevices.front();
 
   // queue create infos
   uint32_t queueFamilyPropertyCount = 0;
@@ -87,7 +90,7 @@ bool createDevice(VkInstance instance, Device *device, VkSurfaceKHR surface) {
       if (!requiredExtension.second) { // not optional
         printf("required device extension not supported: %s\n",
                requiredExtension.first);
-        return false;
+        return nullptr;
       }
     } else {
       enabledDeviceExtensions.emplace_back(requiredExtension.first);
@@ -106,7 +109,7 @@ bool createDevice(VkInstance instance, Device *device, VkSurfaceKHR surface) {
 
   if (vkCreateDevice(device->physicalDevice, &createInfo, nullptr,
                      &device->handle) != VK_SUCCESS) {
-    return false;
+    return nullptr;
   }
 
   // create queues
@@ -133,14 +136,12 @@ bool createDevice(VkInstance instance, Device *device, VkSurfaceKHR surface) {
     }
   }
 
-  return true;
+  return std::move(device);
 }
 
-void destroyDevice(Device *device) {
-  device->queues.clear();
-  vkDestroyDevice(device->handle, nullptr);
-  device->handle = VK_NULL_HANDLE;
-  device->physicalDevice = VK_NULL_HANDLE;
+Device::~Device() {
+  queues.clear();
+  vkDestroyDevice(handle, nullptr);
 }
 
 VkFormat chooseDepthFormat(VkPhysicalDevice physicalDevice, bool depthOnly,

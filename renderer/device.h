@@ -4,6 +4,10 @@
 #include <vector>
 
 struct Device {
+  static std::unique_ptr<Device> make(VkInstance instance,
+                                      VkSurfaceKHR surface);
+
+  ~Device();
   bool getQueue(VkQueueFlags requiredFlags, uint32_t index,
                 const Queue **queue) const;
   bool waitIdle() const;
@@ -13,10 +17,6 @@ struct Device {
   VkDevice handle{VK_NULL_HANDLE};
   std::vector<std::vector<Queue>> queues;
 };
-
-bool createDevice(VkInstance instance, Device *device, VkSurfaceKHR surface);
-
-void destroyDevice(Device *device);
 
 VkFormat chooseDepthFormat(VkPhysicalDevice physicalDevice,
                            bool depthOnly = false,

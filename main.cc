@@ -13,7 +13,7 @@ uint32_t windowHeight{500};
 VkInstance instance{VK_NULL_HANDLE};
 VkDebugUtilsMessengerEXT messenger{VK_NULL_HANDLE};
 VkSurfaceKHR surface{VK_NULL_HANDLE};
-Device device{};
+std::unique_ptr<Device> device;
 
 std::unique_ptr<RenderContext> renderContext;
 
@@ -124,13 +124,13 @@ int main() {
     return 1;
   }
 
-  if (!createDevice(instance, &device, surface)) { return 1; }
+  if (device = Device::make(instance, surface); !device) { return 1; }
 
   int width{0}, height{0};
   glfwGetFramebufferSize(window, &width, &height);
 
   auto swapchain =
-      Swapchain::make(device, surface, {(uint32_t)width, (uint32_t)height}, 3);
+      Swapchain::make(*device, surface, {(uint32_t)width, (uint32_t)height}, 3);
   if (!swapchain) { return 1; }
 
   renderContext = RenderContext::make(std::move(swapchain));
@@ -154,13 +154,13 @@ int main() {
     glfwPollEvents();
   }
 
-  device.waitIdle();
+  device->waitIdle();
 
   renderPipeline.reset();
 
   renderContext.reset();
 
-  destroyDevice(&device);
+  device.reset();
   vkDestroySurfaceKHR(instance, surface, nullptr);
   surface = VK_NULL_HANDLE;
   destroyInstance(&instance, &messenger);
