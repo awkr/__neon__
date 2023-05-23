@@ -1,6 +1,7 @@
 #pragma once
 
 #include "renderer/queue.h"
+#include "renderer/resource_cache.h"
 #include <vector>
 
 struct Device {
@@ -13,9 +14,14 @@ struct Device {
   bool waitIdle() const;
   bool getGraphicsQueue(const Queue **queue) const;
 
+  ResourceCache &getResourceCache() { return resourceCache; }
+
   VkPhysicalDevice physicalDevice{VK_NULL_HANDLE};
   VkDevice handle{VK_NULL_HANDLE};
   std::vector<std::vector<Queue>> queues;
+
+private:
+  ResourceCache resourceCache{};
 };
 
 VkFormat chooseDepthFormat(VkPhysicalDevice physicalDevice,

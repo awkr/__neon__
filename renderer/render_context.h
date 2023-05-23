@@ -2,7 +2,6 @@
 
 #include "renderer/command_buffer.h"
 #include "renderer/render_frame.h"
-#include "renderer/resource_cache.h"
 #include "renderer/swapchain.h"
 
 struct RenderContext {
@@ -15,8 +14,7 @@ public:
   bool begin(CommandBuffer **commandBuffer);
   bool submit(CommandBuffer *commandBuffer);
 
-  ResourceCache &getResourceCache() { return resourceCache; }
-
+  Device *getDevice() { return device; }
   RenderFrame *getActiveFrame();
 
 private:
@@ -36,8 +34,6 @@ private:
   std::unique_ptr<Swapchain> swapchain;
   std::vector<std::unique_ptr<RenderFrame>> frames;
   const Queue *queue{nullptr}; // a present supported queue
-
-  ResourceCache resourceCache{};
 
   VkSemaphore acquiredSemaphore{VK_NULL_HANDLE};
   uint32_t activeFrameIndex{0U};

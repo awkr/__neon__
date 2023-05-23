@@ -34,7 +34,6 @@ RenderContext::make(std::unique_ptr<Swapchain> &&swapchain) {
 }
 
 RenderContext::~RenderContext() {
-  resourceCache.clear();
   frames.clear();
   swapchain.reset();
 }
@@ -147,7 +146,7 @@ bool RenderContext::handleSurfaceChanges() {
     return true;
   }
   if (!device->waitIdle()) { return false; }
-  resourceCache.clearFramebuffers();
+  device->getResourceCache().clearFramebuffers();
   swapchain = Swapchain::make(*swapchain, currentExtent);
   auto it = frames.begin();
   for (auto imageHandle : swapchain->images) {

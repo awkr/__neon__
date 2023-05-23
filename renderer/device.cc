@@ -140,6 +140,7 @@ std::unique_ptr<Device> Device::make(VkInstance instance,
 }
 
 Device::~Device() {
+  resourceCache.clear();
   queues.clear();
   vkDestroyDevice(handle, nullptr);
 }

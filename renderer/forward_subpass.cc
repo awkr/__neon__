@@ -1,4 +1,5 @@
 #include "renderer/forward_subpass.h"
+#include "renderer/device.h"
 #include "scene/mesh.h"
 
 ForwardSubpass::ForwardSubpass(RenderContext *renderContext,
@@ -8,7 +9,7 @@ ForwardSubpass::ForwardSubpass(RenderContext *renderContext,
                       std::move(fragmentShader)) {}
 
 void ForwardSubpass::prepare() {
-  auto &cache = renderContext->getResourceCache();
+  auto &cache = renderContext->getDevice()->getResourceCache();
 
   for (auto mesh : meshes) {
     for (auto subMesh : mesh->subMeshes) {
