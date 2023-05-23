@@ -147,7 +147,9 @@ bool RenderContext::handleSurfaceChanges() {
   }
   if (!device->waitIdle()) { return false; }
   device->getResourceCache().clearFramebuffers();
-  swapchain = Swapchain::make(*swapchain, currentExtent);
+  if (swapchain = Swapchain::make(*swapchain, currentExtent); !swapchain) {
+    return false;
+  }
   auto it = frames.begin();
   for (auto imageHandle : swapchain->images) {
     Image image{};
