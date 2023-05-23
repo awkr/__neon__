@@ -10,11 +10,13 @@ struct Image {
   VkImage handle{VK_NULL_HANDLE};
   VkExtent2D extent{};
   VkFormat format{VK_FORMAT_UNDEFINED};
+  VkSampleCountFlagBits sampleCount{VK_SAMPLE_COUNT_1_BIT};
   VkDeviceMemory memory{VK_NULL_HANDLE};
 };
 
 bool createImage(Image *image, Device *device, VkImage handle,
-                 const VkExtent2D &extent, VkFormat format);
+                 const VkExtent2D &extent, VkFormat format,
+                 VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT);
 
 bool createImage(Image *image, Device *device, const VkExtent2D &extent,
                  VkFormat format, VkImageUsageFlags usage,

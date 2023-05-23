@@ -2,11 +2,13 @@
 #include "renderer/device.h"
 
 bool createImage(Image *image, Device *device, VkImage handle,
-                 const VkExtent2D &extent, VkFormat format) {
+                 const VkExtent2D &extent, VkFormat format,
+                 VkSampleCountFlagBits sampleCount) {
   image->device = device;
   image->handle = handle;
   image->extent = extent;
   image->format = format;
+  image->sampleCount = sampleCount;
   return true;
 }
 
@@ -38,7 +40,7 @@ bool createImage(Image *image, Device *device, const VkExtent2D &extent,
     return false;
   }
 
-  createImage(image, device, handle, extent, format);
+  createImage(image, device, handle, extent, format, sampleCount);
 
   VkMemoryRequirements memoryRequirements{};
   vkGetImageMemoryRequirements(device->handle, image->handle,
