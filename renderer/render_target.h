@@ -21,6 +21,8 @@ struct RenderTarget {
   // void setInputAttachments(const std::vector<uint32_t> &inputs);
   // void setOutputAttachments(const std::vector<uint32_t> &outputs);
 
+  const VkExtent2D &getExtent() const { return extent; }
+
   VkExtent2D extent{};
   std::vector<Image> images;
   std::vector<ImageView> imageViews;

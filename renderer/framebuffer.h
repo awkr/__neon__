@@ -14,7 +14,9 @@ struct Framebuffer : public Resource {
                                            const RenderPass &renderPass);
 
   Framebuffer(Device &device) : device{device} {}
+  ~Framebuffer() override;
 
   Device &device;
   VkFramebuffer handle{VK_NULL_HANDLE};
+  VkExtent2D extent{};
 };
