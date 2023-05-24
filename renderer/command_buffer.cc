@@ -86,6 +86,8 @@ bool CommandBuffer::beginRenderPass(
     const std::vector<LoadStoreOp> &loadStoreOps,
     const std::vector<VkClearValue> &clearValues,
     const std::vector<std::unique_ptr<Subpass>> &subpasses) {
+  // TODO reset states
+
   std::vector<SubpassInfo> subpassInfos(subpasses.size());
   auto it = subpassInfos.begin();
   for (const auto &subpass : subpasses) {
@@ -98,6 +100,7 @@ bool CommandBuffer::beginRenderPass(
   auto renderPass = device.getResourceCache().requestRenderPass(
       device, renderTarget.attachments, loadStoreOps, subpassInfos);
   if (!renderPass) { return false; }
+
   auto framebuffer = device.getResourceCache().requestFramebuffer(
       device, renderTarget, *renderPass);
   if (!framebuffer) { return false; }
@@ -105,7 +108,7 @@ bool CommandBuffer::beginRenderPass(
   return beginRenderPass(*renderPass, renderTarget, *framebuffer, clearValues);
 }
 
-void CommandBuffer::endRenderPass() {}
+void CommandBuffer::endRenderPass() const { vkCmdEndRenderPass(handle); }
 
 void CommandBuffer::nextSubpass() {}
 
@@ -113,5 +116,16 @@ bool CommandBuffer::beginRenderPass(
     const RenderPass &renderPass, const RenderTarget &renderTarget,
     const Framebuffer &framebuffer,
     const std::vector<VkClearValue> &clearValues) {
+  VkRenderPassBeginInfo beginInfo{VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO};
+  beginInfo.renderPass = renderPass.handle;
+  beginInfo.framebuffer = framebuffer.handle;
+  beginInfo.renderArea.extent = renderTarget.getExtent();
+  beginInfo.clearValueCount = clearValues.size();
+  beginInfo.pClearValues = clearValues.data();
+
+  vkCmdBeginRenderPass(handle, &beginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+  // TODO update blend state attachments for first subpass
+
   return true;
 }

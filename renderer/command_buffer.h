@@ -42,7 +42,7 @@ struct CommandBuffer {
                        const std::vector<LoadStoreOp> &loadStoreOps,
                        const std::vector<VkClearValue> &clearValues,
                        const std::vector<std::unique_ptr<Subpass>> &subpasses);
-  void endRenderPass();
+  void endRenderPass() const;
   void nextSubpass();
 
   bool beginRenderPass(const RenderPass &renderPass,
