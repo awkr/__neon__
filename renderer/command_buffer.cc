@@ -102,11 +102,16 @@ bool CommandBuffer::beginRenderPass(
       device, renderTarget, *renderPass);
   if (!framebuffer) { return false; }
 
-  return beginRenderPass();
+  return beginRenderPass(*renderPass, renderTarget, *framebuffer, clearValues);
 }
 
 void CommandBuffer::endRenderPass() {}
 
 void CommandBuffer::nextSubpass() {}
 
-bool CommandBuffer::beginRenderPass() { return true; }
+bool CommandBuffer::beginRenderPass(
+    const RenderPass &renderPass, const RenderTarget &renderTarget,
+    const Framebuffer &framebuffer,
+    const std::vector<VkClearValue> &clearValues) {
+  return true;
+}

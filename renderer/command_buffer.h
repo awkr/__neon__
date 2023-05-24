@@ -8,6 +8,8 @@ struct CommandPool;
 struct ImageView;
 struct RenderTarget;
 struct Subpass;
+struct RenderPass;
+struct Framebuffer;
 
 enum class CommandBufferResetMode {
   ResetPool,
@@ -43,7 +45,10 @@ struct CommandBuffer {
   void endRenderPass();
   void nextSubpass();
 
-  bool beginRenderPass();
+  bool beginRenderPass(const RenderPass &renderPass,
+                       const RenderTarget &renderTarget,
+                       const Framebuffer &framebuffer,
+                       const std::vector<VkClearValue> &clearValues);
 
   Device &device;
   VkCommandBufferLevel level{};
