@@ -98,9 +98,15 @@ bool CommandBuffer::beginRenderPass(
   auto renderPass = device.getResourceCache().requestRenderPass(
       device, renderTarget.attachments, loadStoreOps, subpassInfos);
   if (!renderPass) { return false; }
-  return true;
+  auto framebuffer = device.getResourceCache().requestFramebuffer(
+      device, renderTarget, *renderPass);
+  if (!framebuffer) { return false; }
+
+  return beginRenderPass();
 }
 
 void CommandBuffer::endRenderPass() {}
 
 void CommandBuffer::nextSubpass() {}
+
+bool CommandBuffer::beginRenderPass() { return true; }

@@ -67,6 +67,25 @@ template <> struct hash<SubpassInfo> {
   }
 };
 
+template <> struct hash<RenderTarget> {
+  std::size_t operator()(const RenderTarget &renderTarget) const {
+    std::size_t result = 0;
+    for (const auto &imageView : renderTarget.imageViews) {
+      hashCombine(result, imageView.handle);
+      hashCombine(result, imageView.image->handle);
+    }
+    return result;
+  }
+};
+
+template <> struct hash<RenderPass> {
+  std::size_t operator()(const RenderPass &renderPass) const {
+    std::size_t result = 0;
+    hashCombine(result, renderPass.handle);
+    return result;
+  }
+};
+
 } // namespace std
 
 template <>
@@ -136,6 +155,13 @@ ResourceCache::requestRenderPass(Device &device,
                                  const std::vector<SubpassInfo> &subpasses) {
   return requestResource(mutex.renderPass, state.renderPasses, device,
                          attachments, loadStoreOps, subpasses);
+}
+
+Framebuffer *ResourceCache::requestFramebuffer(Device &device,
+                                               const RenderTarget &renderTarget,
+                                               const RenderPass &renderPass) {
+  return requestResource(mutex.framebuffer, state.framebuffers, device,
+                         renderTarget, renderPass);
 }
 
 void ResourceCache::clearFramebuffers() { state.framebuffers.clear(); }

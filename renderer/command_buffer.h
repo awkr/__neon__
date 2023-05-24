@@ -43,6 +43,8 @@ struct CommandBuffer {
   void endRenderPass();
   void nextSubpass();
 
+  bool beginRenderPass();
+
   Device &device;
   VkCommandBufferLevel level{};
   VkCommandBuffer handle{VK_NULL_HANDLE};

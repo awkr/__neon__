@@ -6,6 +6,8 @@
 #include <glm/gtx/hash.hpp>
 #include <mutex>
 
+struct RenderTarget;
+
 template <typename T> inline void hashCombine(size_t &seed, const T &v) {
   std::hash<T> hasher{};
   glm::detail::hash_combine(seed, hasher(v));
@@ -36,6 +38,9 @@ public:
                                 const std::vector<Attachment> &attachments,
                                 const std::vector<LoadStoreOp> &loadStoreOps,
                                 const std::vector<SubpassInfo> &subpasses);
+  Framebuffer *requestFramebuffer(Device &device,
+                                  const RenderTarget &renderTarget,
+                                  const RenderPass &renderPass);
 
   void clearFramebuffers();
   void clear();
@@ -45,5 +50,6 @@ private:
   struct {
     std::mutex shaderModule;
     std::mutex renderPass;
+    std::mutex framebuffer;
   } mutex;
 };
