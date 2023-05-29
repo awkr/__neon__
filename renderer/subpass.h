@@ -10,8 +10,8 @@ public:
 
   virtual ~Subpass() = default;
 
-  virtual void prepare() = 0;
-  virtual void draw() = 0;
+  virtual void prepare()                          = 0;
+  virtual void draw(CommandBuffer &commandBuffer) = 0;
 
   // void updateRenderTarget(RenderTarget &renderTarget);
 
@@ -26,8 +26,8 @@ public:
 
 protected:
   RenderContext *renderContext{nullptr};
-  ShaderSource vertexShader{};
-  ShaderSource fragmentShader{};
+  ShaderSource   vertexShader{};
+  ShaderSource   fragmentShader{};
 
   // default to no input attachments
   std::vector<uint32_t> inputAttachments{};

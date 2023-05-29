@@ -29,7 +29,7 @@ bool SemaphorePool::requestSemaphore(VkSemaphore &semaphore) {
     semaphore = semaphores[activeSemaphoreCount++];
     return true;
   }
-  VkSemaphore handle{VK_NULL_HANDLE};
+  VkSemaphore           handle{VK_NULL_HANDLE};
   VkSemaphoreCreateInfo createInfo{VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO};
   if (vkCreateSemaphore(device.handle, &createInfo, nullptr, &handle) !=
       VK_SUCCESS) {

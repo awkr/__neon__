@@ -7,23 +7,13 @@ AllowShortEnumsOnASingleLine: true
 AllowShortFunctionsOnASingleLine: All
 AllowShortLoopsOnASingleLine: true
 AlignConsecutiveMacros: Consecutive
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive
 
 #AccessModifierOffset: -2
 #AlignAfterOpenBracket: Align
 #AlignArrayOfStructures: None
-#AlignConsecutiveAssignments:
-#  Enabled: false
-#  AcrossEmptyLines: false
-#  AcrossComments: false
-#  AlignCompound: false
-#  PadOperators: true
 #AlignConsecutiveBitFields:
-#  Enabled: false
-#  AcrossEmptyLines: false
-#  AcrossComments: false
-#  AlignCompound: false
-#  PadOperators: false
-#AlignConsecutiveDeclarations:
 #  Enabled: false
 #  AcrossEmptyLines: false
 #  AcrossComments: false

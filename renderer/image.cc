@@ -4,11 +4,11 @@
 bool createImage(Image *image, Device *device, VkImage handle,
                  const VkExtent2D &extent, VkFormat format,
                  VkImageUsageFlags usage, VkSampleCountFlagBits sampleCount) {
-  image->device = device;
-  image->handle = handle;
-  image->extent = extent;
-  image->format = format;
-  image->usage = usage;
+  image->device      = device;
+  image->handle      = handle;
+  image->extent      = extent;
+  image->format      = format;
+  image->usage       = usage;
   image->sampleCount = sampleCount;
   return true;
 }
@@ -17,22 +17,22 @@ bool createImage(Image *image, Device *device, const VkExtent2D &extent,
                  VkFormat format, VkImageUsageFlags usage,
                  VkMemoryPropertyFlags memoryProperty, uint32_t mipLevels,
                  uint32_t arrayLayers, VkSampleCountFlagBits sampleCount,
-                 VkImageTiling tiling,
+                 VkImageTiling         tiling,
                  std::vector<uint32_t> queueFamilyIndices) {
   VkImageCreateInfo imageCreateInfo{VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO};
-  imageCreateInfo.imageType = VK_IMAGE_TYPE_2D;
-  imageCreateInfo.format = format;
-  imageCreateInfo.extent = {extent.width, extent.height, 1};
-  imageCreateInfo.mipLevels = mipLevels;
+  imageCreateInfo.imageType   = VK_IMAGE_TYPE_2D;
+  imageCreateInfo.format      = format;
+  imageCreateInfo.extent      = {extent.width, extent.height, 1};
+  imageCreateInfo.mipLevels   = mipLevels;
   imageCreateInfo.arrayLayers = arrayLayers;
-  imageCreateInfo.samples = sampleCount;
-  imageCreateInfo.tiling = tiling;
-  imageCreateInfo.usage = usage;
+  imageCreateInfo.samples     = sampleCount;
+  imageCreateInfo.tiling      = tiling;
+  imageCreateInfo.usage       = usage;
 
   if (!queueFamilyIndices.empty()) {
-    imageCreateInfo.sharingMode = VK_SHARING_MODE_CONCURRENT;
+    imageCreateInfo.sharingMode           = VK_SHARING_MODE_CONCURRENT;
     imageCreateInfo.queueFamilyIndexCount = queueFamilyIndices.size();
-    imageCreateInfo.pQueueFamilyIndices = queueFamilyIndices.data();
+    imageCreateInfo.pQueueFamilyIndices   = queueFamilyIndices.data();
   }
 
   VkImage handle{VK_NULL_HANDLE};

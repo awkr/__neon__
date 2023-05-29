@@ -20,17 +20,17 @@ RenderContext::make(std::unique_ptr<Swapchain> &&swapchain) {
 
     auto renderFrame = std::make_unique<RenderFrame>(*swapchain->device,
                                                      std::move(renderTarget));
-    renderFrames[i] = std::move(renderFrame);
+    renderFrames[i]  = std::move(renderFrame);
   }
 
   const Queue *queue{nullptr};
   if (!swapchain->device->getGraphicsQueue(&queue)) { return nullptr; }
 
-  auto renderContext = std::make_unique<RenderContext>();
-  renderContext->device = swapchain->device;
+  auto renderContext       = std::make_unique<RenderContext>();
+  renderContext->device    = swapchain->device;
   renderContext->swapchain = std::move(swapchain);
-  renderContext->frames = std::move(renderFrames);
-  renderContext->queue = queue;
+  renderContext->frames    = std::move(renderFrames);
+  renderContext->queue     = queue;
   return std::move(renderContext);
 }
 
@@ -80,10 +80,10 @@ bool RenderContext::endFrame(VkSemaphore waitSemaphore) {
   VkPresentInfoKHR presentInfo{VK_STRUCTURE_TYPE_PRESENT_INFO_KHR};
 
   presentInfo.waitSemaphoreCount = 1;
-  presentInfo.pWaitSemaphores = &waitSemaphore;
-  presentInfo.swapchainCount = 1;
-  presentInfo.pSwapchains = &swapchain->handle;
-  presentInfo.pImageIndices = &activeFrameIndex;
+  presentInfo.pWaitSemaphores    = &waitSemaphore;
+  presentInfo.swapchainCount     = 1;
+  presentInfo.pSwapchains        = &swapchain->handle;
+  presentInfo.pImageIndices      = &activeFrameIndex;
 
   if (!queue->present(presentInfo)) { return false; }
 
@@ -95,11 +95,11 @@ bool RenderContext::endFrame(VkSemaphore waitSemaphore) {
 
 void RenderContext::waitFrame() { getActiveFrame()->reset(); }
 
-bool RenderContext::submit(const Queue &graphicsQueue,
+bool RenderContext::submit(const Queue                        &graphicsQueue,
                            const std::vector<CommandBuffer *> &commandBuffers,
-                           VkSemaphore waitSemaphore,
+                           VkSemaphore                         waitSemaphore,
                            VkPipelineStageFlags waitPipelineStage,
-                           VkSemaphore *renderCompleteSemaphore) {
+                           VkSemaphore         *renderCompleteSemaphore) {
   std::vector<VkCommandBuffer> commandBufferHandles(commandBuffers.size(),
                                                     VK_NULL_HANDLE);
   std::transform(
@@ -114,16 +114,16 @@ bool RenderContext::submit(const Queue &graphicsQueue,
 
   VkSubmitInfo submitInfo{VK_STRUCTURE_TYPE_SUBMIT_INFO};
   submitInfo.commandBufferCount = commandBufferHandles.size();
-  submitInfo.pCommandBuffers = commandBufferHandles.data();
+  submitInfo.pCommandBuffers    = commandBufferHandles.data();
 
   if (waitSemaphore) {
     submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = &waitSemaphore;
-    submitInfo.pWaitDstStageMask = &waitPipelineStage;
+    submitInfo.pWaitSemaphores    = &waitSemaphore;
+    submitInfo.pWaitDstStageMask  = &waitPipelineStage;
   }
 
   submitInfo.signalSemaphoreCount = 1;
-  submitInfo.pSignalSemaphores = &signalSemaphore;
+  submitInfo.pSignalSemaphores    = &signalSemaphore;
 
   VkFence fence{VK_NULL_HANDLE};
   if (!frame->requestFence(fence)) { return false; }
@@ -137,7 +137,7 @@ bool RenderContext::submit(const Queue &graphicsQueue,
 
 bool RenderContext::handleSurfaceChanges() {
   VkSurfaceCapabilitiesKHR properties{};
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice,
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device->physicalDevice.handle,
                                             swapchain->surface, &properties);
   const auto &currentExtent = properties.currentExtent;
   if (currentExtent.width == 0xffffffff) { return false; }

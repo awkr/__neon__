@@ -3,8 +3,9 @@
 #include "renderer/image.h"
 
 struct ImageView {
-  Image *image{nullptr};
-  VkImageView handle{VK_NULL_HANDLE};
+  Image                  *image{nullptr};
+  VkFormat                format{VK_FORMAT_UNDEFINED};
+  VkImageView             handle{VK_NULL_HANDLE};
   VkImageSubresourceRange subresourceRange{};
 };
 

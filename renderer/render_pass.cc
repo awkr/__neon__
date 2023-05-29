@@ -3,14 +3,14 @@
 #include "renderer/render_target.h"
 
 std::vector<VkAttachmentDescription>
-getAttachmentDescriptions(const std::vector<Attachment> &attachments,
+getAttachmentDescriptions(const std::vector<Attachment>  &attachments,
                           const std::vector<LoadStoreOp> &loadStoreOps) {
   std::vector<VkAttachmentDescription> attachmentDescriptions;
 
   for (size_t i = 0U; i < attachments.size(); ++i) {
     VkAttachmentDescription description{};
-    description.format = attachments[i].format;
-    description.samples = attachments[i].sampleCount;
+    description.format        = attachments[i].format;
+    description.samples       = attachments[i].sampleCount;
     description.initialLayout = attachments[i].initialLayout;
 
     if (isDepthOnlyFormat(description.format)) {
@@ -22,7 +22,7 @@ getAttachmentDescriptions(const std::vector<Attachment> &attachments,
       description.finalLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     }
 
-    description.loadOp = loadStoreOps[i].loadOp;
+    description.loadOp  = loadStoreOps[i].loadOp;
     description.storeOp = loadStoreOps[i].storeOp;
 
     attachmentDescriptions.emplace_back(description);
@@ -31,14 +31,14 @@ getAttachmentDescriptions(const std::vector<Attachment> &attachments,
   return std::move(attachmentDescriptions);
 }
 
-VkAttachmentReference getAttachmentReference(const uint32_t attachment,
+VkAttachmentReference getAttachmentReference(const uint32_t      attachment,
                                              const VkImageLayout layout) {
   VkAttachmentReference reference{.attachment = attachment, .layout = layout};
   return reference;
 }
 
 void setAttachmentLayouts(
-    std::vector<VkSubpassDescription> &subpassDescriptions,
+    std::vector<VkSubpassDescription>    &subpassDescriptions,
     std::vector<VkAttachmentDescription> &attachmentDescriptions) {
   // Make the initial layout same as in the first subpass using that attachment
   for (auto &subpass : subpassDescriptions) {
@@ -103,8 +103,7 @@ void setAttachmentLayouts(
   }
 }
 
-std::vector<VkSubpassDependency>
-getSubpassDependencies(const size_t subpassCount) {
+std::vector<VkSubpassDependency> getSubpassDependencies(size_t subpassCount) {
   std::vector<VkSubpassDependency> dependencies(subpassCount - 1);
 
   for (uint32_t i = 0; i < dependencies.size(); ++i) {
@@ -113,9 +112,9 @@ getSubpassDependencies(const size_t subpassCount) {
     dependencies[i].dstSubpass = i + 1;
     dependencies[i].srcStageMask =
         VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    dependencies[i].dstStageMask = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
-    dependencies[i].srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    dependencies[i].dstAccessMask = VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
+    dependencies[i].dstStageMask    = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+    dependencies[i].srcAccessMask   = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    dependencies[i].dstAccessMask   = VK_ACCESS_INPUT_ATTACHMENT_READ_BIT;
     dependencies[i].dependencyFlags = VK_DEPENDENCY_BY_REGION_BIT;
   }
 
@@ -190,10 +189,10 @@ RenderPass::make(Device &device, const std::vector<Attachment> &attachments,
     VkSubpassDescription subpassDescription{};
     subpassDescription.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
 
-    subpassDescription.pInputAttachments = inputAttachments[i].data();
+    subpassDescription.pInputAttachments    = inputAttachments[i].data();
     subpassDescription.inputAttachmentCount = inputAttachments[i].size();
 
-    subpassDescription.pColorAttachments = colorAttachments[i].data();
+    subpassDescription.pColorAttachments    = colorAttachments[i].data();
     subpassDescription.colorAttachmentCount = colorAttachments[i].size();
 
     subpassDescription.pDepthStencilAttachment =
@@ -204,27 +203,36 @@ RenderPass::make(Device &device, const std::vector<Attachment> &attachments,
 
   setAttachmentLayouts(subpassDescriptions, attachmentDescriptions);
 
+  auto renderPass = std::make_unique<RenderPass>(device);
+
+  renderPass->colorOutputCount.resize(subpasses.size());
+
+  for (size_t i = 0; i < subpasses.size(); ++i) {
+    renderPass->colorOutputCount.push_back(colorAttachments[i].size());
+  }
+
   const auto &subpassDependencies = getSubpassDependencies(subpasses.size());
 
   VkRenderPassCreateInfo createInfo{VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO};
   createInfo.attachmentCount = attachmentDescriptions.size();
-  createInfo.pAttachments = attachmentDescriptions.data();
-  createInfo.subpassCount = subpassDescriptions.size();
-  createInfo.pSubpasses = subpassDescriptions.data();
+  createInfo.pAttachments    = attachmentDescriptions.data();
+  createInfo.subpassCount    = subpassDescriptions.size();
+  createInfo.pSubpasses      = subpassDescriptions.data();
   createInfo.dependencyCount = subpassDependencies.size();
-  createInfo.pDependencies = subpassDependencies.data();
+  createInfo.pDependencies   = subpassDependencies.data();
 
-  VkRenderPass handle{VK_NULL_HANDLE};
-  if (vkCreateRenderPass(device.handle, &createInfo, nullptr, &handle) !=
-      VK_SUCCESS) {
+  if (vkCreateRenderPass(device.handle, &createInfo, nullptr,
+                         &renderPass->handle) != VK_SUCCESS) {
     return nullptr;
   }
 
-  auto renderPass = std::make_unique<RenderPass>(device);
-  renderPass->handle = handle;
   return renderPass;
 }
 
 RenderPass::~RenderPass() {
-  vkDestroyRenderPass(device.handle, handle, nullptr);
+  vkDestroyRenderPass(device.getHandle(), handle, nullptr);
+}
+
+uint32_t RenderPass::getColorOutputCount(uint32_t subpassIndex) const {
+  return colorOutputCount[subpassIndex];
 }

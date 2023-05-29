@@ -406,7 +406,7 @@ std::ostream &operator<<(std::ostream &os, const VkFormat &format) {
   return os;
 }
 
-std::ostream &operator<<(std::ostream &os,
+std::ostream &operator<<(std::ostream             &os,
                          const VkSurfaceFormatKHR &surfaceFormat) {
   os << "(" << surfaceFormat.format << ", ";
 
@@ -421,7 +421,7 @@ std::ostream &operator<<(std::ostream &os,
   return os;
 }
 
-std::ostream &operator<<(std::ostream &os,
+std::ostream &operator<<(std::ostream                 &os,
                          VkSurfaceTransformFlagBitsKHR surfaceTransform) {
   switch (surfaceTransform) {
   case VK_SURFACE_TRANSFORM_IDENTITY_BIT_KHR:
@@ -461,7 +461,7 @@ std::ostream &operator<<(std::ostream &os,
   return os;
 }
 
-std::ostream &operator<<(std::ostream &os,
+std::ostream &operator<<(std::ostream               &os,
                          VkCompositeAlphaFlagBitsKHR compositeAlpha) {
   switch (compositeAlpha) {
   case VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR:

@@ -1,8 +1,9 @@
 #include "renderer/command_pool.h"
 #include "renderer/device.h"
 
-std::unique_ptr<CommandPool> CommandPool::make(Device &device,
-                                               uint32_t queueFamilyIndex,
+std::unique_ptr<CommandPool> CommandPool::make(Device      &device,
+                                               uint32_t     queueFamilyIndex,
+                                               RenderFrame *renderFrame,
                                                CommandBufferResetMode resetMode,
                                                size_t threadIndex) {
   VkCommandPoolCreateFlags flags;
@@ -19,16 +20,17 @@ std::unique_ptr<CommandPool> CommandPool::make(Device &device,
   VkCommandPoolCreateInfo createInfo{
       VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO};
   createInfo.queueFamilyIndex = queueFamilyIndex;
-  createInfo.flags = flags;
+  createInfo.flags            = flags;
 
   VkCommandPool handle{VK_NULL_HANDLE};
-  auto result =
+  auto          result =
       vkCreateCommandPool(device.handle, &createInfo, nullptr, &handle);
   if (result != VK_SUCCESS) { return nullptr; }
 
-  auto commandPool = std::make_unique<CommandPool>(device);
-  commandPool->resetMode = resetMode;
-  commandPool->handle = handle;
+  auto commandPool         = std::make_unique<CommandPool>(device);
+  commandPool->renderFrame = renderFrame;
+  commandPool->resetMode   = resetMode;
+  commandPool->handle      = handle;
   commandPool->threadIndex = threadIndex;
   return std::move(commandPool);
 }
@@ -39,7 +41,7 @@ CommandPool::~CommandPool() {
   vkDestroyCommandPool(device.handle, handle, nullptr);
 }
 
-bool CommandPool::requestCommandBuffer(CommandBuffer **commandBuffer,
+bool CommandPool::requestCommandBuffer(CommandBuffer      **commandBuffer,
                                        VkCommandBufferLevel level) {
   if (level == VK_COMMAND_BUFFER_LEVEL_PRIMARY) {
     if (activePrimaryCommandBufferCount < primaryCommandBuffers.size()) {
@@ -48,7 +50,7 @@ bool CommandPool::requestCommandBuffer(CommandBuffer **commandBuffer,
       return true;
     }
 
-    auto command = CommandBuffer::make(this, level);
+    auto command = CommandBuffer::make(*this, level);
     if (!command) { return false; }
 
     primaryCommandBuffers.emplace_back(std::move(command));
@@ -63,7 +65,7 @@ bool CommandPool::requestCommandBuffer(CommandBuffer **commandBuffer,
     return true;
   }
 
-  auto command = CommandBuffer::make(this, level);
+  auto command = CommandBuffer::make(*this, level);
   if (!command) { return false; }
 
   secondaryCommandBuffers.emplace_back(std::move(command));

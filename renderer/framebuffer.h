@@ -9,14 +9,16 @@ struct RenderTarget;
 struct RenderPass;
 
 struct Framebuffer : public Resource {
-  static std::unique_ptr<Framebuffer> make(Device &device,
+  static std::unique_ptr<Framebuffer> make(Device             &device,
                                            const RenderTarget &renderTarget,
-                                           const RenderPass &renderPass);
+                                           const RenderPass   &renderPass);
 
   Framebuffer(Device &device) : device{device} {}
   ~Framebuffer() override;
 
-  Device &device;
+  VkFramebuffer getHandle() const { return handle; }
+
+  Device       &device;
   VkFramebuffer handle{VK_NULL_HANDLE};
-  VkExtent2D extent{};
+  VkExtent2D    extent{};
 };

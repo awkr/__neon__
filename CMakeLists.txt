@@ -21,6 +21,7 @@ add_executable(neon
     main.cc
     renderer/instance.cc
     renderer/device.cc
+    renderer/physical_device.cc
     renderer/swapchain.cc
     renderer/image.cc
     renderer/render_target.cc
@@ -40,7 +41,18 @@ add_executable(neon
     renderer/command_buffer.cc
     renderer/fence_pool.cc
     renderer/framebuffer.cc
-    renderer/render_pass.cc)
+    renderer/render_pass.cc
+    renderer/pipeline_state.cc
+    renderer/pipeline_layout.cc
+    renderer/descriptor_set_layout.cc
+    renderer/descriptor_set.cc
+    renderer/descriptor_pool.cc
+    renderer/buffer.cc
+    renderer/pipeline.cc
+    renderer/resource_binding_state.cc
+    renderer/sampler.cc
+    scene/scene.cc
+    scene/sub_mesh.cc)
 
 target_link_libraries(neon PRIVATE glfw Vulkan::Vulkan glm glslang glslang-default-resource-limits SPIRV)
 

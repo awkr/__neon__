@@ -8,23 +8,22 @@ void RenderPipeline::addSubpass(std::unique_ptr<Subpass> &&subpass) {
 }
 
 bool RenderPipeline::draw(CommandBuffer &commandBuffer,
-                          RenderTarget &renderTarget) {
+                          RenderTarget  &renderTarget) {
   while (clearValue.size() < renderTarget.getAttachments().size()) {
-    clearValue.push_back({0.0f, 0.0f, 0.0f, 1.0f});
+    clearValue.push_back(clearValue.front());
   }
+
+  if (!commandBuffer.beginRenderPass(renderTarget, loadStoreOps, clearValue,
+                                     subpasses)) {
+    return false;
+  }
+
   for (size_t i = 0; i < subpasses.size(); ++i) {
-    auto &subpass = subpasses[i];
-    // subpass->updateRenderTarget(renderTarget);
-    if (i == 0) {
-      if (!commandBuffer.beginRenderPass(renderTarget, loadStoreOps, clearValue,
-                                         subpasses)) {
-        return false;
-      }
-    } else {
-      commandBuffer.nextSubpass();
-    }
-    subpass->draw();
+    if (i > 0) { commandBuffer.nextSubpass(); }
+    subpasses[i]->draw(commandBuffer);
   }
+
   commandBuffer.endRenderPass();
+
   return true;
 }

@@ -4,24 +4,31 @@
 #include "renderer/instance.h"
 #include "renderer/render_context.h"
 #include "renderer/render_pipeline.h"
+#include "scene/scene.h"
 #include <GLFW/glfw3.h>
 
-const char *windowTitle = "neon";
-uint32_t windowWidth{800};
-uint32_t windowHeight{500};
+struct WindowState {
+  uint32_t    width{800};
+  uint32_t    height{500};
+  std::string title{"neon"};
+};
 
-VkInstance instance{VK_NULL_HANDLE};
+WindowState windowState{};
+
+VkInstance               instance{VK_NULL_HANDLE};
 VkDebugUtilsMessengerEXT messenger{VK_NULL_HANDLE};
-VkSurfaceKHR surface{VK_NULL_HANDLE};
-std::unique_ptr<Device> device;
+VkSurfaceKHR             surface{VK_NULL_HANDLE};
+std::unique_ptr<Device>  device;
 
 std::unique_ptr<RenderContext> renderContext;
+
+std::unique_ptr<Scene>          scene;
 std::unique_ptr<RenderPipeline> renderPipeline;
 
 void setViewport(CommandBuffer &commandBuffer, const VkExtent2D &extent) {
   VkViewport viewport{};
-  viewport.width = static_cast<float>(extent.width);
-  viewport.height = static_cast<float>(extent.height);
+  viewport.width    = static_cast<float>(extent.width);
+  viewport.height   = static_cast<float>(extent.height);
   viewport.minDepth = 0.0f;
   viewport.maxDepth = 1.0f;
   commandBuffer.setViewport(viewport);
@@ -48,8 +55,8 @@ void render(CommandBuffer &commandBuffer, RenderTarget &renderTarget) {
     memoryBarrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     memoryBarrier.srcAccess = 0;
     memoryBarrier.dstAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    memoryBarrier.srcStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    memoryBarrier.dstStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    memoryBarrier.srcStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    memoryBarrier.dstStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
 
     commandBuffer.imageMemoryBarrier(imageViews[0], memoryBarrier);
 
@@ -78,8 +85,8 @@ void render(CommandBuffer &commandBuffer, RenderTarget &renderTarget) {
     memoryBarrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
     memoryBarrier.newLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
     memoryBarrier.srcAccess = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
-    memoryBarrier.srcStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-    memoryBarrier.dstStage = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
+    memoryBarrier.srcStage  = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    memoryBarrier.dstStage  = VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT;
 
     commandBuffer.imageMemoryBarrier(imageViews[0], memoryBarrier);
   }
@@ -97,6 +104,12 @@ bool update() {
   return true;
 }
 
+void loadScene() {
+  scene = std::make_unique<Scene>();
+
+  // TODO
+}
+
 int main() {
   std::cout << LOG_COLOR_MAGENTA << "Hello, stranger." << LOG_COLOR_RESET
             << std::endl;
@@ -105,8 +118,8 @@ int main() {
   glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
   glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 
-  auto window = glfwCreateWindow(windowWidth, windowHeight, windowTitle,
-                                 nullptr, nullptr);
+  auto window = glfwCreateWindow(windowState.width, windowState.height,
+                                 windowState.title.c_str(), nullptr, nullptr);
   if (!window) {
     glfwTerminate();
     return 1;
@@ -145,18 +158,26 @@ int main() {
     return 1;
   }
 
+  loadScene();
+
   auto sceneSubpass = std::make_unique<ForwardSubpass>(
-      renderContext.get(), std::move(vertShader), std::move(fragShader));
+      renderContext.get(), std::move(vertShader), std::move(fragShader),
+      *scene);
 
   renderPipeline = std::make_unique<RenderPipeline>();
   renderPipeline->addSubpass(std::move(sceneSubpass));
 
   while (!glfwWindowShouldClose(window)) {
-    if (!update()) { printf("update error\n"); }
+    if (!update()) {
+      std::cout << LOG_COLOR_RED << "Update error" << LOG_COLOR_RESET
+                << std::endl;
+    }
     glfwPollEvents();
   }
 
   device->waitIdle();
+
+  scene.reset();
 
   renderPipeline.reset();
 

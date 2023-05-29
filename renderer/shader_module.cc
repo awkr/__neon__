@@ -6,7 +6,7 @@
 #include <glslang/Public/ResourceLimits.h>
 #include <iostream>
 
-bool createShaderSource(ShaderSource *shaderSource,
+bool createShaderSource(ShaderSource      *shaderSource,
                         const std::string &filepath) {
   std::string source{};
   if (!readFile(filepath, source)) { return false; }
@@ -15,13 +15,13 @@ bool createShaderSource(ShaderSource *shaderSource,
   shaderSource->id = hasher(std::string{source.cbegin(), source.cend()});
 
   shaderSource->filepath = filepath;
-  shaderSource->source = std::move(source);
+  shaderSource->source   = std::move(source);
 
   return true;
 }
 
 // Pre-compile shader files to include header code
-bool precompileShader(const std::string &source,
+bool precompileShader(const std::string        &source,
                       std::vector<std::string> &finalSource) {
   auto lines = split(source, '\n');
 
@@ -29,7 +29,7 @@ bool precompileShader(const std::string &source,
     trim(line);
     if (line.find("#include \"") == 0) {
       std::string includePath = line.substr(10);
-      size_t lastQuote = includePath.find('"');
+      size_t      lastQuote   = includePath.find('"');
       if (!includePath.empty() && lastQuote != std::string::npos) {
         includePath = includePath.substr(0, lastQuote);
       }
@@ -112,16 +112,16 @@ inline EShLanguage findShaderLanguage(VkShaderStageFlagBits stage) {
   }
 }
 
-bool compileToSpirv(VkShaderStageFlagBits stage,
+bool compileToSpirv(VkShaderStageFlagBits       stage,
                     const std::vector<uint8_t> &glsl, const std::string &entry,
-                    const ShaderVariant &variant,
+                    const ShaderVariant        &variant,
                     std::vector<std::uint32_t> &spirv, std::string &infoLog) {
   glslang::InitializeProcess(); // Initialize glslang library
 
   auto messages = static_cast<EShMessages>(EShMsgDefault | EShMsgVulkanRules |
                                            EShMsgSpvRules);
 
-  auto lang = findShaderLanguage(stage);
+  auto lang   = findShaderLanguage(stage);
   auto source = std::string(glsl.begin(), glsl.end());
 
   const char *filenames[1] = {""};
@@ -192,7 +192,7 @@ void ShaderVariant::addDefinitions(
 void ShaderVariant::addDefinition(
     const std::pair<std::string, std::string> &definition) {
   const auto &identifier = definition.first;
-  const auto &token = definition.second;
+  const auto &token      = definition.second;
 
   preamble.append("#define " + identifier + " " + token + "\n");
   processes.emplace_back("D" + identifier + " " + token);
@@ -205,16 +205,16 @@ void ShaderVariant::updateId() {
   id = hasher(preamble);
 }
 
-std::unique_ptr<ShaderModule> ShaderModule::make(Device &device,
+std::unique_ptr<ShaderModule> ShaderModule::make(Device               &device,
                                                  VkShaderStageFlagBits stage,
-                                                 const ShaderSource &source,
-                                                 const std::string &entry,
+                                                 const ShaderSource   &source,
+                                                 const std::string    &entry,
                                                  const ShaderVariant &variant) {
   std::vector<std::string> finalSource{};
   if (!precompileShader(source.source, finalSource)) { return nullptr; }
 
   std::vector<uint32_t> spirv{};
-  std::string infoLog{};
+  std::string           infoLog{};
   if (!compileToSpirv(stage, convertToBytes(finalSource), entry, variant, spirv,
                       infoLog)) {
     std::cout << "[Shader] Make shader module failed: " << infoLog << std::endl;
@@ -223,12 +223,14 @@ std::unique_ptr<ShaderModule> ShaderModule::make(Device &device,
 
   // Generate a unique id, determined by source and variant
   std::hash<std::string> hasher{};
-  size_t id = hasher(
-      std::string{reinterpret_cast<const char *>(spirv.data()),
+  size_t                 id = hasher(
+                      std::string{reinterpret_cast<const char *>(spirv.data()),
                   reinterpret_cast<const char *>(spirv.data() + spirv.size())});
 
-  auto shaderModule = std::make_unique<ShaderModule>();
-  shaderModule->id = id;
-  shaderModule->spirv = std::move(spirv);
+  auto shaderModule        = std::make_unique<ShaderModule>();
+  shaderModule->id         = id;
+  shaderModule->stage      = stage;
+  shaderModule->spirv      = std::move(spirv);
+  shaderModule->entryPoint = entry;
   return std::move(shaderModule);
 }

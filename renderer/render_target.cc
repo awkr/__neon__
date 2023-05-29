@@ -4,15 +4,15 @@
 const RenderTarget::CreateFunc RenderTarget::DEFAULT_CREATE_FUNC =
     [](Image color) -> std::unique_ptr<RenderTarget> {
   Image depth{};
-  auto format = chooseDepthFormat(color.device->physicalDevice);
-  auto usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT |
+  auto  format = chooseDepthFormat(color.device->physicalDevice.handle);
+  auto  usage  = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT |
                VK_IMAGE_USAGE_TRANSIENT_ATTACHMENT_BIT;
   if (!createImage(&depth, color.device, color.extent, format, usage,
                    VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT)) {
     return nullptr;
   }
 
-  auto renderTarget = std::make_unique<RenderTarget>();
+  auto renderTarget    = std::make_unique<RenderTarget>();
   renderTarget->extent = color.extent;
   renderTarget->images.emplace_back(color);
   renderTarget->images.emplace_back(depth);
@@ -24,8 +24,8 @@ const RenderTarget::CreateFunc RenderTarget::DEFAULT_CREATE_FUNC =
     renderTarget->imageViews.emplace_back(imageView);
 
     renderTarget->attachments.emplace_back(Attachment{
-        .format = image.format,
-        .usage = image.usage,
+        .format      = image.format,
+        .usage       = image.usage,
         .sampleCount = image.sampleCount,
     });
   }

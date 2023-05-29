@@ -4,8 +4,8 @@
 #include <vulkan/vulkan_metal.h>
 
 VKAPI_ATTR VkBool32 VKAPI_CALL messengerCallback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
-    VkDebugUtilsMessageTypeFlagsEXT messageType,
+    VkDebugUtilsMessageSeverityFlagBitsEXT      messageSeverity,
+    VkDebugUtilsMessageTypeFlagsEXT             messageType,
     const VkDebugUtilsMessengerCallbackDataEXT *callbackData, void *userData) {
   if ((messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) ||
       (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)) {
@@ -17,9 +17,9 @@ VKAPI_ATTR VkBool32 VKAPI_CALL messengerCallback(
 bool createInstance(VkInstance *instance, VkDebugUtilsMessengerEXT *messenger) {
   // extension name: optional
   std::unordered_map<const char *, bool> requiredInstanceExtensions;
-  requiredInstanceExtensions[VK_EXT_DEBUG_UTILS_EXTENSION_NAME] = false;
+  requiredInstanceExtensions[VK_EXT_DEBUG_UTILS_EXTENSION_NAME]   = false;
   requiredInstanceExtensions[VK_EXT_METAL_SURFACE_EXTENSION_NAME] = false;
-  requiredInstanceExtensions[VK_KHR_SURFACE_EXTENSION_NAME] = false;
+  requiredInstanceExtensions[VK_KHR_SURFACE_EXTENSION_NAME]       = false;
   requiredInstanceExtensions[VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME] =
       true;
 
@@ -87,20 +87,20 @@ bool createInstance(VkInstance *instance, VkDebugUtilsMessengerEXT *messenger) {
 
   VkApplicationInfo appInfo{VK_STRUCTURE_TYPE_APPLICATION_INFO};
 
-  appInfo.pApplicationName = "Neon";
+  appInfo.pApplicationName   = "Neon";
   appInfo.applicationVersion = 0;
-  appInfo.pEngineName = "Neon";
-  appInfo.engineVersion = 0;
-  appInfo.apiVersion = VK_API_VERSION_1_3;
+  appInfo.pEngineName        = "Neon";
+  appInfo.engineVersion      = 0;
+  appInfo.apiVersion         = VK_API_VERSION_1_3;
 
   VkInstanceCreateInfo instanceInfo{VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
 
   instanceInfo.pApplicationInfo = &appInfo;
 
-  instanceInfo.enabledExtensionCount = enabledInstanceExtensions.size();
+  instanceInfo.enabledExtensionCount   = enabledInstanceExtensions.size();
   instanceInfo.ppEnabledExtensionNames = enabledInstanceExtensions.data();
 
-  instanceInfo.enabledLayerCount = enabledInstanceLayers.size();
+  instanceInfo.enabledLayerCount   = enabledInstanceLayers.size();
   instanceInfo.ppEnabledLayerNames = enabledInstanceLayers.data();
 
   VkDebugUtilsMessengerCreateInfoEXT messengerCreateInfo{
@@ -134,7 +134,7 @@ bool createInstance(VkInstance *instance, VkDebugUtilsMessengerEXT *messenger) {
   return true;
 }
 
-void destroyInstance(VkInstance *instance,
+void destroyInstance(VkInstance               *instance,
                      VkDebugUtilsMessengerEXT *messenger) {
   auto fnVkDestroyDebugUtilsMessengerEXT =
       reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(

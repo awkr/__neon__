@@ -13,7 +13,7 @@ bool FencePool::requestFence(VkFence &fence) {
     fence = fences[activeFenceCount++];
     return true;
   }
-  VkFence handle{VK_NULL_HANDLE};
+  VkFence           handle{VK_NULL_HANDLE};
   VkFenceCreateInfo createInfo{VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
   if (vkCreateFence(device.handle, &createInfo, nullptr, &handle) !=
       VK_SUCCESS) {

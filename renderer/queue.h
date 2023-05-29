@@ -5,11 +5,11 @@
 
 struct Queue {
   bool submit(const std::vector<VkSubmitInfo> &submitInfos,
-              VkFence fence) const;
+              VkFence                          fence) const;
   bool present(const VkPresentInfoKHR &presentInfo) const;
 
-  VkQueue handle{VK_NULL_HANDLE};
-  uint32_t familyIndex{UINT32_MAX};
+  VkQueue                 handle{VK_NULL_HANDLE};
+  uint32_t                familyIndex{UINT32_MAX};
   VkQueueFamilyProperties properties{};
-  VkBool32 supportPresent{false};
+  VkBool32                supportPresent{false};
 };

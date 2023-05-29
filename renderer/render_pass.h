@@ -10,7 +10,7 @@ struct Attachment;
 struct SubpassInfo {
   std::vector<uint32_t> inputAttachments;
   std::vector<uint32_t> outputAttachments;
-  bool enableDepthStencilAttachment{true};
+  bool                  enableDepthStencilAttachment{true};
 };
 
 struct RenderPass : public Resource {
@@ -22,6 +22,11 @@ struct RenderPass : public Resource {
   RenderPass(Device &device) : device{device} {}
   ~RenderPass() override;
 
-  Device &device;
-  VkRenderPass handle{VK_NULL_HANDLE};
+  uint32_t getColorOutputCount(uint32_t subpassIndex) const;
+
+  VkRenderPass getHandle() const { return handle; }
+
+  Device               &device;
+  VkRenderPass          handle{VK_NULL_HANDLE};
+  std::vector<uint32_t> colorOutputCount;
 };

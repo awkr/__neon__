@@ -14,7 +14,7 @@ bool isDepthStencilFormat(VkFormat format) {
          format == VK_FORMAT_D32_SFLOAT_S8_UINT || isDepthOnlyFormat(format);
 }
 
-std::unique_ptr<Device> Device::make(VkInstance instance,
+std::unique_ptr<Device> Device::make(VkInstance   instance,
                                      VkSurfaceKHR surface) {
   // pick a physical device
   uint32_t physicalDeviceCount{0};
@@ -28,18 +28,15 @@ std::unique_ptr<Device> Device::make(VkInstance instance,
   auto device = std::make_unique<Device>();
 
   // just simply pick the first one
-  device->physicalDevice = physicalDevices.front();
+  auto physicalDevice    = physicalDevices.front();
+  device->physicalDevice = std::move(PhysicalDevice(physicalDevice));
 
   // queue create infos
-  uint32_t queueFamilyPropertyCount = 0;
-  vkGetPhysicalDeviceQueueFamilyProperties(device->physicalDevice,
-                                           &queueFamilyPropertyCount, nullptr);
+  uint32_t queueFamilyPropertyCount =
+      device->physicalDevice.queueFamilyProperties.size();
 
-  std::vector<VkQueueFamilyProperties> queueFamilyProperties(
-      queueFamilyPropertyCount);
-  vkGetPhysicalDeviceQueueFamilyProperties(device->physicalDevice,
-                                           &queueFamilyPropertyCount,
-                                           queueFamilyProperties.data());
+  const auto &queueFamilyProperties =
+      device->physicalDevice.queueFamilyProperties;
 
   std::vector<VkDeviceQueueCreateInfo> queueCreateInfos(
       queueFamilyPropertyCount, {VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO});
@@ -55,7 +52,7 @@ std::unique_ptr<Device> Device::make(VkInstance instance,
     auto &queueCreateInfo = queueCreateInfos[queueFamilyIndex];
 
     queueCreateInfo.queueFamilyIndex = queueFamilyIndex;
-    queueCreateInfo.queueCount = queueFamilyProperty.queueCount;
+    queueCreateInfo.queueCount       = queueFamilyProperty.queueCount;
     queueCreateInfo.pQueuePriorities = queuePriorities[queueFamilyIndex].data();
   }
 
@@ -64,15 +61,15 @@ std::unique_ptr<Device> Device::make(VkInstance instance,
   // extension name: optional
   std::unordered_map<const char *, bool> requiredDeviceExtensions;
   requiredDeviceExtensions[VK_KHR_SWAPCHAIN_EXTENSION_NAME] = false;
-  requiredDeviceExtensions["VK_KHR_portability_subset"] = true;
+  requiredDeviceExtensions["VK_KHR_portability_subset"]     = true;
 
   uint32_t deviceExtensionCount;
-  vkEnumerateDeviceExtensionProperties(device->physicalDevice, nullptr,
+  vkEnumerateDeviceExtensionProperties(device->physicalDevice.handle, nullptr,
                                        &deviceExtensionCount, nullptr);
 
   std::vector<VkExtensionProperties> availableDeviceExtensions(
       deviceExtensionCount);
-  vkEnumerateDeviceExtensionProperties(device->physicalDevice, nullptr,
+  vkEnumerateDeviceExtensionProperties(device->physicalDevice.handle, nullptr,
                                        &deviceExtensionCount,
                                        availableDeviceExtensions.data());
 
@@ -99,15 +96,15 @@ std::unique_ptr<Device> Device::make(VkInstance instance,
 
   VkDeviceCreateInfo createInfo{VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO};
 
-  createInfo.pQueueCreateInfos = queueCreateInfos.data();
-  createInfo.queueCreateInfoCount = queueCreateInfos.size();
-  createInfo.enabledExtensionCount = enabledDeviceExtensions.size();
+  createInfo.pQueueCreateInfos       = queueCreateInfos.data();
+  createInfo.queueCreateInfoCount    = queueCreateInfos.size();
+  createInfo.enabledExtensionCount   = enabledDeviceExtensions.size();
   createInfo.ppEnabledExtensionNames = enabledDeviceExtensions.data();
 
   VkPhysicalDeviceFeatures features{.samplerAnisotropy = VK_TRUE};
   createInfo.pEnabledFeatures = &features;
 
-  if (vkCreateDevice(device->physicalDevice, &createInfo, nullptr,
+  if (vkCreateDevice(device->physicalDevice.handle, &createInfo, nullptr,
                      &device->handle) != VK_SUCCESS) {
     return nullptr;
   }
@@ -123,13 +120,14 @@ std::unique_ptr<Device> Device::make(VkInstance instance,
       vkGetDeviceQueue(device->handle, queueFamilyIndex, queueIndex, &handle);
 
       VkBool32 supportPresent{VK_FALSE};
-      vkGetPhysicalDeviceSurfaceSupportKHR(
-          device->physicalDevice, queueFamilyIndex, surface, &supportPresent);
+      vkGetPhysicalDeviceSurfaceSupportKHR(device->physicalDevice.handle,
+                                           queueFamilyIndex, surface,
+                                           &supportPresent);
 
       Queue queue{
-          .handle = handle,
-          .familyIndex = queueFamilyIndex,
-          .properties = queueFamilyProperty,
+          .handle         = handle,
+          .familyIndex    = queueFamilyIndex,
+          .properties     = queueFamilyProperty,
           .supportPresent = supportPresent,
       };
       device->queues[queueFamilyIndex].emplace_back(queue);
@@ -175,7 +173,7 @@ VkFormat chooseDepthFormat(VkPhysicalDevice physicalDevice, bool depthOnly,
 bool getMemoryTypeIndex(Device *device, uint32_t typeBits,
                         VkMemoryPropertyFlags property, uint32_t &typeIndex) {
   VkPhysicalDeviceMemoryProperties memoryProperties{};
-  vkGetPhysicalDeviceMemoryProperties(device->physicalDevice,
+  vkGetPhysicalDeviceMemoryProperties(device->physicalDevice.handle,
                                       &memoryProperties);
 
   for (uint32_t i = 0; i < memoryProperties.memoryTypeCount; ++i) {
@@ -197,7 +195,7 @@ bool Device::getQueue(VkQueueFlags requiredFlags, uint32_t index,
        ++queueFamilyIndex) {
     const auto &q = queues[queueFamilyIndex][0];
 
-    auto queueFlags = q.properties.queueFlags;
+    auto     queueFlags = q.properties.queueFlags;
     uint32_t queueCount = q.properties.queueCount;
 
     if (((queueFlags & requiredFlags) == requiredFlags) && index < queueCount) {

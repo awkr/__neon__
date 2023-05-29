@@ -5,8 +5,8 @@ bool createImageView(ImageView *imageView, Image *image) {
   VkImageViewCreateInfo imageViewCreateInfo{
       VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO};
   imageViewCreateInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-  imageViewCreateInfo.image = image->handle;
-  imageViewCreateInfo.format = image->format;
+  imageViewCreateInfo.image    = image->handle;
+  imageViewCreateInfo.format   = image->format;
 
   if (isDepthOnlyFormat(image->format)) {
     imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
@@ -17,17 +17,17 @@ bool createImageView(ImageView *imageView, Image *image) {
     imageViewCreateInfo.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
   }
 
-  imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
-  imageViewCreateInfo.subresourceRange.levelCount = 1;
+  imageViewCreateInfo.subresourceRange.baseMipLevel   = 0;
+  imageViewCreateInfo.subresourceRange.levelCount     = 1;
   imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-  imageViewCreateInfo.subresourceRange.layerCount = 1;
+  imageViewCreateInfo.subresourceRange.layerCount     = 1;
 
   if (vkCreateImageView(image->device->handle, &imageViewCreateInfo, nullptr,
                         &imageView->handle) != VK_SUCCESS) {
     return false;
   }
 
-  imageView->image = image;
+  imageView->image            = image;
   imageView->subresourceRange = imageViewCreateInfo.subresourceRange;
   return true;
 }

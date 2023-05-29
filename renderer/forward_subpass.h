@@ -5,8 +5,8 @@
 struct ForwardSubpass : public GeometrySubpass {
 public:
   ForwardSubpass(RenderContext *renderContext, ShaderSource &&vertexShader,
-                 ShaderSource &&fragmentShader);
+                 ShaderSource &&fragmentShader, Scene &scene);
 
   void prepare() override;
-  void draw() override;
+  void draw(CommandBuffer &commandBuffer) override;
 };

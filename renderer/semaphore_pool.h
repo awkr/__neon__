@@ -14,8 +14,8 @@ struct SemaphorePool {
   void reset();
 
 private:
-  Device &device;
+  Device                  &device;
   std::vector<VkSemaphore> semaphores;
   std::vector<VkSemaphore> releasedSemaphores;
-  uint32_t activeSemaphoreCount{0};
+  uint32_t                 activeSemaphoreCount{0};
 };

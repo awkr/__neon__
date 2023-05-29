@@ -15,7 +15,7 @@ uint32_t chooseImageArrayLayers(uint32_t requestImageArrayLayers,
                                 uint32_t maxImageArrayLayers);
 
 VkSurfaceFormatKHR chooseSurfaceFormat(
-    const VkSurfaceFormatKHR &requestedSurfaceFormat,
+    const VkSurfaceFormatKHR              &requestedSurfaceFormat,
     const std::vector<VkSurfaceFormatKHR> &availableSurfaceFormats,
     const std::vector<VkSurfaceFormatKHR> &surfaceFormatPriority);
 
@@ -24,17 +24,17 @@ bool validateFormatFeature(VkImageUsageFlagBits imageUsage,
 
 std::set<VkImageUsageFlagBits>
 chooseImageUsage(const std::set<VkImageUsageFlagBits> &requestedImageUsages,
-                 VkImageUsageFlags supportedImageUsage,
-                 VkFormatFeatureFlags supportedFeatures);
+                 VkImageUsageFlags                     supportedImageUsage,
+                 VkFormatFeatureFlags                  supportedFeatures);
 
 VkSurfaceTransformFlagBitsKHR
 chooseTransform(VkSurfaceTransformFlagBitsKHR requestTransform,
-                VkSurfaceTransformFlagsKHR supportedTransform,
+                VkSurfaceTransformFlagsKHR    supportedTransform,
                 VkSurfaceTransformFlagBitsKHR currentTransform);
 
 VkCompositeAlphaFlagBitsKHR
 chooseCompositeAlpha(VkCompositeAlphaFlagBitsKHR requestCompositeAlpha,
-                     VkCompositeAlphaFlagsKHR supportedCompositeAlpha);
+                     VkCompositeAlphaFlagsKHR    supportedCompositeAlpha);
 
 VkExtent2D chooseExtent(const VkExtent2D &requestExtent,
                         const VkExtent2D &minExtent,
@@ -77,7 +77,7 @@ uint32_t chooseImageArrayLayers(uint32_t requestImageArrayLayers,
 }
 
 VkSurfaceFormatKHR chooseSurfaceFormat(
-    const VkSurfaceFormatKHR &requestedSurfaceFormat,
+    const VkSurfaceFormatKHR              &requestedSurfaceFormat,
     const std::vector<VkSurfaceFormatKHR> &availableSurfaceFormats,
     const std::vector<VkSurfaceFormatKHR> &surfaceFormatPriority) {
   auto it = std::find_if(
@@ -129,8 +129,8 @@ bool validateFormatFeature(VkImageUsageFlagBits imageUsage,
 
 std::set<VkImageUsageFlagBits>
 chooseImageUsage(const std::set<VkImageUsageFlagBits> &requestedImageUsages,
-                 VkImageUsageFlags supportedImageUsage,
-                 VkFormatFeatureFlags supportedFeatures) {
+                 VkImageUsageFlags                     supportedImageUsage,
+                 VkFormatFeatureFlags                  supportedFeatures) {
   std::set<VkImageUsageFlagBits> validatedImageUsages;
   for (auto requestedImageUsage : requestedImageUsages) {
     if ((requestedImageUsage & supportedImageUsage) &&
@@ -176,7 +176,7 @@ compositeImageUsages(const std::set<VkImageUsageFlagBits> &imageUsages) {
 
 VkSurfaceTransformFlagBitsKHR
 chooseTransform(VkSurfaceTransformFlagBitsKHR requestTransform,
-                VkSurfaceTransformFlagsKHR supportedTransform,
+                VkSurfaceTransformFlagsKHR    supportedTransform,
                 VkSurfaceTransformFlagBitsKHR currentTransform) {
   if (requestTransform & supportedTransform) { return requestTransform; }
 
@@ -188,7 +188,7 @@ chooseTransform(VkSurfaceTransformFlagBitsKHR requestTransform,
 
 VkCompositeAlphaFlagBitsKHR
 chooseCompositeAlpha(VkCompositeAlphaFlagBitsKHR requestCompositeAlpha,
-                     VkCompositeAlphaFlagsKHR supportedCompositeAlpha) {
+                     VkCompositeAlphaFlagsKHR    supportedCompositeAlpha) {
   if (requestCompositeAlpha & supportedCompositeAlpha) {
     return requestCompositeAlpha;
   }
@@ -213,9 +213,9 @@ chooseCompositeAlpha(VkCompositeAlphaFlagBitsKHR requestCompositeAlpha,
 
 std::unique_ptr<Swapchain>
 Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
-                uint16_t imageCount,
+                uint16_t                              imageCount,
                 const std::set<VkImageUsageFlagBits> &imageUsages,
-                const VkSurfaceFormatKHR &surfaceFormat,
+                const VkSurfaceFormatKHR             &surfaceFormat,
                 VkPresentModeKHR presentMode, VkSwapchainKHR oldSwapchain) {
   const std::vector<VkSurfaceFormatKHR> surfaceFormatPriority{
       {VK_FORMAT_R8G8B8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR},
@@ -229,25 +229,26 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
   };
 
   uint32_t surfaceFormatCount{0U};
-  vkGetPhysicalDeviceSurfaceFormatsKHR(device.physicalDevice, surface,
+  vkGetPhysicalDeviceSurfaceFormatsKHR(device.physicalDevice.handle, surface,
                                        &surfaceFormatCount, nullptr);
 
   std::vector<VkSurfaceFormatKHR> surfaceFormats(surfaceFormatCount);
-  vkGetPhysicalDeviceSurfaceFormatsKHR(device.physicalDevice, surface,
+  vkGetPhysicalDeviceSurfaceFormatsKHR(device.physicalDevice.handle, surface,
                                        &surfaceFormatCount,
                                        surfaceFormats.data());
 
   uint32_t presentModeCount{0U};
-  vkGetPhysicalDeviceSurfacePresentModesKHR(device.physicalDevice, surface,
-                                            &presentModeCount, nullptr);
+  vkGetPhysicalDeviceSurfacePresentModesKHR(
+      device.physicalDevice.handle, surface, &presentModeCount, nullptr);
 
   std::vector<VkPresentModeKHR> presentModes(presentModeCount);
-  vkGetPhysicalDeviceSurfacePresentModesKHR(
-      device.physicalDevice, surface, &presentModeCount, presentModes.data());
+  vkGetPhysicalDeviceSurfacePresentModesKHR(device.physicalDevice.handle,
+                                            surface, &presentModeCount,
+                                            presentModes.data());
 
   VkSurfaceCapabilitiesKHR surfaceCapabilities{};
-  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device.physicalDevice, surface,
-                                            &surfaceCapabilities);
+  vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device.physicalDevice.handle,
+                                            surface, &surfaceCapabilities);
 
   SwapchainProperties properties{};
 
@@ -266,7 +267,7 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
       chooseSurfaceFormat(surfaceFormat, surfaceFormats, surfaceFormatPriority);
 
   VkFormatProperties formatProperties{};
-  vkGetPhysicalDeviceFormatProperties(device.physicalDevice,
+  vkGetPhysicalDeviceFormatProperties(device.physicalDevice.handle,
                                       properties.surfaceFormat.format,
                                       &formatProperties);
 
@@ -288,17 +289,17 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
   //
   VkSwapchainCreateInfoKHR createInfo{
       VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR};
-  createInfo.minImageCount = properties.imageCount;
-  createInfo.imageExtent = properties.extent;
-  createInfo.presentMode = properties.presentMode;
-  createInfo.imageFormat = properties.surfaceFormat.format;
-  createInfo.imageColorSpace = properties.surfaceFormat.colorSpace;
+  createInfo.minImageCount    = properties.imageCount;
+  createInfo.imageExtent      = properties.extent;
+  createInfo.presentMode      = properties.presentMode;
+  createInfo.imageFormat      = properties.surfaceFormat.format;
+  createInfo.imageColorSpace  = properties.surfaceFormat.colorSpace;
   createInfo.imageArrayLayers = properties.imageArrayLayers;
-  createInfo.imageUsage = compositeImageUsages(properties.imageUsages);
-  createInfo.preTransform = properties.preTransform;
-  createInfo.compositeAlpha = properties.compositeAlpha;
-  createInfo.oldSwapchain = oldSwapchain;
-  createInfo.surface = surface;
+  createInfo.imageUsage       = compositeImageUsages(properties.imageUsages);
+  createInfo.preTransform     = properties.preTransform;
+  createInfo.compositeAlpha   = properties.compositeAlpha;
+  createInfo.oldSwapchain     = oldSwapchain;
+  createInfo.surface          = surface;
 
   VkSwapchainKHR handle{VK_NULL_HANDLE};
   if (vkCreateSwapchainKHR(device.handle, &createInfo, nullptr, &handle) !=
@@ -306,8 +307,8 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
     return nullptr;
   }
 
-  auto swapchain = std::make_unique<Swapchain>(&device, surface);
-  swapchain->handle = handle;
+  auto swapchain        = std::make_unique<Swapchain>(&device, surface);
+  swapchain->handle     = handle;
   swapchain->properties = properties;
 
   uint32_t imageAvailable{0U};
@@ -321,7 +322,7 @@ Swapchain::make(Device &device, VkSurfaceKHR surface, const VkExtent2D &extent,
   return std::move(swapchain);
 }
 
-std::unique_ptr<Swapchain> Swapchain::make(Swapchain &oldSwapchain,
+std::unique_ptr<Swapchain> Swapchain::make(Swapchain        &oldSwapchain,
                                            const VkExtent2D &extent) {
   return Swapchain::make(*oldSwapchain.device, oldSwapchain.surface, extent,
                          oldSwapchain.properties.imageCount,

@@ -11,7 +11,7 @@ inline std::vector<std::string> split(const std::string &input, char delim) {
   std::vector<std::string> tokens;
 
   std::stringstream sstream(input);
-  std::string token{};
+  std::string       token{};
   while (std::getline(sstream, token, delim)) { tokens.emplace_back(token); }
 
   return tokens;

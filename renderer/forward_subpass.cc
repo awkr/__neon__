@@ -4,9 +4,9 @@
 
 ForwardSubpass::ForwardSubpass(RenderContext *renderContext,
                                ShaderSource &&vertexShader,
-                               ShaderSource &&fragmentShader)
+                               ShaderSource &&fragmentShader, Scene &scene)
     : GeometrySubpass(renderContext, std::move(vertexShader),
-                      std::move(fragmentShader)) {}
+                      std::move(fragmentShader), scene) {}
 
 void ForwardSubpass::prepare() {
   auto &cache = renderContext->getDevice()->getResourceCache();
@@ -15,14 +15,14 @@ void ForwardSubpass::prepare() {
     for (const auto &subMesh : mesh->subMeshes) {
       const auto &variant = subMesh->shaderVariant;
 
-      cache.requestShaderModule(*renderContext->getDevice(),
-                                VK_SHADER_STAGE_VERTEX_BIT, vertexShader,
+      cache.requestShaderModule(VK_SHADER_STAGE_VERTEX_BIT, vertexShader,
                                 variant);
-      cache.requestShaderModule(*renderContext->getDevice(),
-                                VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader,
+      cache.requestShaderModule(VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader,
                                 variant);
     }
   }
 }
 
-void ForwardSubpass::draw() {}
+void ForwardSubpass::draw(CommandBuffer &commandBuffer) {
+  GeometrySubpass::draw(commandBuffer);
+}

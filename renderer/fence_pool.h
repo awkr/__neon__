@@ -12,7 +12,7 @@ struct FencePool {
   bool wait(uint64_t timeout = UINT64_MAX);
   bool reset();
 
-  Device &device;
+  Device              &device;
   std::vector<VkFence> fences;
-  uint32_t activeFenceCount{0};
+  uint32_t             activeFenceCount{0};
 };

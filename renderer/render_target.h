@@ -4,10 +4,10 @@
 #include <functional>
 
 struct Attachment {
-  VkFormat format{VK_FORMAT_UNDEFINED};
-  VkImageUsageFlags usage{};
+  VkFormat              format{VK_FORMAT_UNDEFINED};
+  VkImageUsageFlags     usage{};
   VkSampleCountFlagBits sampleCount{VK_SAMPLE_COUNT_1_BIT};
-  VkImageLayout initialLayout{VK_IMAGE_LAYOUT_UNDEFINED}; // TODO
+  VkImageLayout         initialLayout{VK_IMAGE_LAYOUT_UNDEFINED}; // TODO
 };
 
 struct RenderTarget {
@@ -23,9 +23,9 @@ struct RenderTarget {
 
   const VkExtent2D &getExtent() const { return extent; }
 
-  VkExtent2D extent{};
-  std::vector<Image> images;
-  std::vector<ImageView> imageViews;
+  VkExtent2D              extent{};
+  std::vector<Image>      images;
+  std::vector<ImageView>  imageViews;
   std::vector<Attachment> attachments;
 
   // // default to no input attachments
